@@ -1,0 +1,26 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: elasticsearch-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: elasticsearch
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/elasticsearch_data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: elasticsearch-pv-claim
+spec:
+  storageClassName: elasticsearch
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi

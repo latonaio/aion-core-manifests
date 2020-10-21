@@ -1,0 +1,728 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: controller-serviceaccount
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: clusterrolebinding-default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: controller-serviceaccount
+  namespace: default
+---
+apiVersion: v1
+data:
+  envoy.yaml: |
+    static_resources:
+      listeners:
+      - name: redis_listener
+        address:
+          socket_address:
+            address: 0.0.0.0
+            port_value: 1999
+        filter_chains:
+        - filters:
+          - name: envoy.filters.network.redis_proxy
+            typed_config:
+              "@type": type.googleapis.com/envoy.config.filter.network.redis_proxy.v2.RedisProxy
+              stat_prefix: egress_redis
+              settings:
+                op_timeout: 5s
+              prefix_routes:
+                catch_all_route:
+                  cluster: redis_cluster
+      clusters:
+      - name: redis_cluster
+        connect_timeout: 1s
+        type: strict_dns # static
+        lb_policy: MAGLEV
+        load_assignment:
+          cluster_name: redis_cluster
+          endpoints:
+          - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: redis
+                    port_value: 6379
+kind: ConfigMap
+metadata:
+  name: envoy-config-kanban-replicator
+  namespace: default
+---
+apiVersion: v1
+data:
+  envoy.yaml: |
+    static_resources:
+      listeners:
+      - name: grpc_listener
+        address:
+          socket_address:
+            address: 0.0.0.0
+            port_value: 10000
+        filter_chains:
+        - filters:
+          - name: envoy.filters.network.http_connection_manager
+            typed_config:
+              "@type": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager
+              codec_type: auto
+              stat_prefix: ingress_http
+              stream_idle_timeout: 0s
+              route_config:
+                name: local_route
+                virtual_hosts:
+                - name: send_anything_grpc
+                  domains:
+                  - "*"
+                  routes:
+                  - match:
+                      prefix: "/"
+                      grpc: {}
+                    route:
+                      cluster: send_anything_grpc
+              http_filters:
+              - name: envoy.filters.http.router
+                typed_config: {}
+      clusters:
+      - name: send_anything_grpc
+        connect_timeout: 0.250s
+        type: strict_dns
+        lb_policy: round_robin
+        http2_protocol_options: {}
+        load_assignment:
+          cluster_name: send_anything_grpc
+          endpoints:
+          - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: 127.0.0.1
+                    port_value: 11011
+    admin:
+      access_log_path: /tmp/admin_access.log
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 10001
+kind: ConfigMap
+metadata:
+  name: envoy-config-sendanything
+  namespace: default
+---
+apiVersion: v1
+data:
+  envoy.yaml: |
+    static_resources:
+      listeners:
+      - name: redis_listener
+        address:
+          socket_address:
+            address: 0.0.0.0
+            port_value: 1999
+        filter_chains:
+        - filters:
+          - name: envoy.filters.network.redis_proxy
+            typed_config:
+              "@type": type.googleapis.com/envoy.config.filter.network.redis_proxy.v2.RedisProxy
+              stat_prefix: egress_redis
+              settings:
+                op_timeout: 5s
+              prefix_routes:
+                catch_all_route:
+                  cluster: redis_cluster
+      clusters:
+      - name: redis_cluster
+        connect_timeout: 1s
+        type: strict_dns # static
+        lb_policy: MAGLEV
+        load_assignment:
+          cluster_name: redis_cluster
+          endpoints:
+          - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: redis
+                    port_value: 6379
+    admin:
+      access_log_path: /tmp/admin_access.log
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 10001
+kind: ConfigMap
+metadata:
+  name: envoy-config-servicebroker
+  namespace: default
+---
+apiVersion: v1
+data:
+  envoy.yaml: |
+    static_resources:
+      listeners:
+      - name: grpc_listener
+        address:
+          socket_address:
+            address: 0.0.0.0
+            port_value: 10000
+        filter_chains:
+        - filters:
+          - name: envoy.filters.network.http_connection_manager
+            typed_config:
+              "@type": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager
+              codec_type: auto
+              stat_prefix: ingress_http
+              stream_idle_timeout: 0s
+              route_config:
+                name: local_route
+                virtual_hosts:
+                - name: status_kanban_grpc
+                  domains:
+                  - "*"
+                  routes:
+                  - match:
+                      prefix: "/"
+                      grpc: {}
+                    route:
+                      cluster: status_kanban_grpc
+              http_filters:
+              - name: envoy.filters.http.router
+                typed_config: {}
+      - name: redis_listener
+        address:
+          socket_address:
+            address: 0.0.0.0
+            port_value: 1999
+        filter_chains:
+        - filters:
+          - name: envoy.filters.network.redis_proxy
+            typed_config:
+              "@type": type.googleapis.com/envoy.config.filter.network.redis_proxy.v2.RedisProxy
+              stat_prefix: egress_redis
+              settings:
+                op_timeout: 5s
+              prefix_routes:
+                catch_all_route:
+                  cluster: redis_cluster
+      clusters:
+      - name: redis_cluster
+        connect_timeout: 1s
+        type: strict_dns # static
+        lb_policy: MAGLEV
+        load_assignment:
+          cluster_name: redis_cluster
+          endpoints:
+          - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: redis
+                    port_value: 6379
+      - name: status_kanban_grpc
+        connect_timeout: 0.250s
+        type: strict_dns
+        lb_policy: round_robin
+        http2_protocol_options: {}
+        load_assignment:
+          cluster_name: status_kanban_grpc
+          endpoints:
+          - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: 127.0.0.1
+                    port_value: 11010
+    admin:
+      access_log_path: /tmp/admin_access.log
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 10001
+kind: ConfigMap
+metadata:
+  name: envoy-config-statuskanban
+  namespace: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: aion-sendanything
+  name: aion-sendanything
+  namespace: default
+spec:
+  ports:
+  - name: envoy-grpc
+    nodePort: 30100
+    port: 10000
+    protocol: TCP
+    targetPort: 10000
+  - name: envoy-admin
+    port: 10001
+    protocol: TCP
+    targetPort: 10001
+  selector:
+    run: aion-sendanything
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: aion-servicebroker
+  name: aion-servicebroker
+  namespace: default
+spec:
+  ports:
+  - name: envoy-admin
+    port: 10001
+    protocol: TCP
+    targetPort: 10001
+  selector:
+    run: aion-servicebroker
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: aion-statuskanban
+  name: aion-statuskanban
+  namespace: default
+spec:
+  ports:
+  - name: envoy-grpc
+    port: 10000
+    protocol: TCP
+    targetPort: 10000
+  - name: envoy-admin
+    port: 10001
+    protocol: TCP
+    targetPort: 10001
+  selector:
+    run: aion-statuskanban
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  namespace: default
+spec:
+  ports:
+  - nodePort: 30017
+    port: 27017
+    targetPort: 27017
+  selector:
+    app: mongo
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cluster
+  namespace: default
+spec:
+  ports:
+  - nodePort: 30379
+    port: 6379
+    targetPort: 6379
+  selector:
+    app: redis-cluster
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: aion-kanban-replicator
+  name: aion-kanban-replicator
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: aion-kanban-replicator
+  strategy:
+    rollingUpdate: null
+  template:
+    metadata:
+      labels:
+        run: aion-kanban-replicator
+    spec:
+      containers:
+      - env:
+        - name: REDIS_HOST
+          value: redis-cluster:6379
+        - name: MONGO_HOST
+          value: mongo:27017
+        image: latonaio/aion-kanban-replicator:latest
+        imagePullPolicy: IfNotPresent
+        name: aion-kanban-replicator
+        volumeMounts:
+        - mountPath: /var/lib/aion/config
+          name: config
+      - args:
+        - -l
+        - debug
+        - --config-path
+        - /etc/envoy/envoy.yaml
+        command:
+        - /usr/local/bin/envoy
+        image: latonaio/envoy:latest
+        imagePullPolicy: IfNotPresent
+        name: envoy
+        ports:
+        - containerPort: 6379
+          name: envoy-redis
+        - containerPort: 10001
+          name: envoy-admin
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 64Mi
+        volumeMounts:
+        - mountPath: /etc/envoy
+          name: envoy
+      hostname: aion-kanban-replicator
+      imagePullSecrets:
+      - name: dockerhub
+      shareProcessNamespace: true
+      volumes:
+      - hostPath:
+          path: /var/lib/aion/default/config
+        name: config
+      - configMap:
+          name: envoy-config-kanban-replicator
+        name: envoy
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: aion-sendanything
+  name: aion-sendanything
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: aion-sendanything
+  strategy:
+    rollingUpdate: null
+  template:
+    metadata:
+      labels:
+        run: aion-sendanything
+    spec:
+      containers:
+      - image: latonaio/aion-sendanything:latest
+        imagePullPolicy: IfNotPresent
+        name: aion-sendanything
+        ports:
+        - containerPort: 11011
+          name: grpc
+        volumeMounts:
+        - mountPath: /var/lib/aion
+          name: data
+      - args:
+        - --config-path /etc/envoy/envoy.yaml
+        command:
+        - /usr/local/bin/envoy
+        image: latonaio/envoy:latest
+        imagePullPolicy: IfNotPresent
+        name: envoy
+        ports:
+        - containerPort: 10000
+          name: envoy-grpc
+        - containerPort: 10001
+          name: envoy-admin
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 64Mi
+        volumeMounts:
+        - mountPath: /etc/envoy
+          name: envoy
+      hostname: aion-sendanything
+      imagePullSecrets:
+      - name: dockerhub
+      shareProcessNamespace: true
+      volumes:
+      - configMap:
+          name: envoy-config-sendanything
+        name: envoy
+      - hostPath:
+          path: /var/lib/aion/default
+        name: data
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: aion-servicebroker
+  name: aion-servicebroker
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: aion-servicebroker
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        run: aion-servicebroker
+    spec:
+      containers:
+      - env:
+        - name: REDIS_HOST
+          value: redis-cluster:6379
+        image: latonaio/aion-servicebroker:latest
+        imagePullPolicy: IfNotPresent
+        name: aion-servicebroker
+        resources:
+          limits:
+            cpu: 20m
+            memory: 128Mi
+          requests:
+            cpu: 5m
+            memory: 50Mi
+        volumeMounts:
+        - mountPath: /var/lib/aion/config
+          name: config
+      - args:
+        - --config-path /etc/envoy/envoy.yaml
+        command:
+        - /usr/local/bin/envoy
+        image: latonaio/envoy:latest
+        imagePullPolicy: IfNotPresent
+        name: envoy
+        ports:
+        - containerPort: 6379
+          name: envoy-redis
+        - containerPort: 10001
+          name: envoy-admin
+        resources:
+          limits:
+            cpu: 20m
+            memory: 512Mi
+          requests:
+            cpu: 5m
+            memory: 64Mi
+        volumeMounts:
+        - mountPath: /etc/envoy
+          name: envoy
+      hostname: aion-servicebroker
+      imagePullSecrets:
+      - name: dockerhub
+      initContainers:
+      - args:
+        - /bin/sh
+        - -c
+        - until redis-cli -h redis-cluster -p 6379 SET connectivity true; do echo
+          "wait..."; sleep 5; done
+        image: redis:6.0-rc-alpine3.11
+        imagePullPolicy: IfNotPresent
+        name: check-connectivity-redis
+      serviceAccountName: controller-serviceaccount
+      shareProcessNamespace: true
+      volumes:
+      - configMap:
+          name: envoy-config-servicebroker
+        name: envoy
+      - hostPath:
+          path: /var/lib/aion/default/config
+        name: config
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: aion-statuskanban
+  name: aion-statuskanban
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: aion-statuskanban
+  strategy:
+    rollingUpdate: null
+  template:
+    metadata:
+      labels:
+        run: aion-statuskanban
+    spec:
+      containers:
+      - env:
+        - name: REDIS_HOST
+          value: redis-cluster:6379
+        image: latonaio/aion-statuskanban:latest
+        imagePullPolicy: IfNotPresent
+        name: aion-statuskanban
+        ports:
+        - containerPort: 11010
+          name: grpc
+      - args:
+        - -l
+        - debug
+        - --config-path
+        - /etc/envoy/envoy.yaml
+        command:
+        - /usr/local/bin/envoy
+        image: latonaio/envoy:latest
+        imagePullPolicy: IfNotPresent
+        name: envoy
+        ports:
+        - containerPort: 6379
+          name: envoy-redis
+        - containerPort: 10000
+          name: envoy-grpc
+        - containerPort: 10001
+          name: envoy-admin
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 64Mi
+        volumeMounts:
+        - mountPath: /etc/envoy
+          name: envoy
+      hostname: aion-statuskanban
+      imagePullSecrets:
+      - name: dockerhub
+      initContainers:
+      - args:
+        - /bin/sh
+        - -c
+        - until redis-cli -h redis-cluster -p 6379 SET connectivity true; do echo
+          "wait..."; sleep 5; done
+        image: redis:6.0-rc-alpine3.11
+        imagePullPolicy: IfNotPresent
+        name: check-connectivity-redis
+      shareProcessNamespace: true
+      volumes:
+      - configMap:
+          name: envoy-config-statuskanban
+        name: envoy
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: mongo
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - env:
+        - name: MONGODB_USER
+          value: root
+        - name: MONGODB_PASS
+          value: root
+        image: mongo:4.4
+        name: mongo
+        ports:
+        - containerPort: 27017
+          name: mongo
+        resources:
+          limits:
+            cpu: 100m
+            memory: 512Mi
+          requests:
+            cpu: 10m
+            memory: 100Mi
+        volumeMounts:
+        - mountPath: /data/db
+          name: mongo-persistent-storage
+      volumes:
+      - name: mongo-persistent-storage
+        persistentVolumeClaim:
+          claimName: mongo-pv-claim
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-cluster
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: redis-cluster
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: redis-cluster
+    spec:
+      containers:
+      - args:
+        - --timeout
+        - "600"
+        - --loglevel
+        - debug
+        image: redis:6.0-rc-alpine3.11
+        name: redis-cluster
+        ports:
+        - containerPort: 6379
+          name: redis-cluster
+        resources:
+          limits:
+            cpu: 100m
+            memory: 512Mi
+          requests:
+            cpu: 5m
+            memory: 50Mi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    type: local
+  name: mongo-pv-volume-default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 5Gi
+  hostPath:
+    path: /var/lib/aion/default/mnt/mongo_data
+  storageClassName: mongo
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pv-claim
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: mongo
+  volumeName: mongo-pv-volume-default

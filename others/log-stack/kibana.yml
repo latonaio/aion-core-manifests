@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+spec:
+  selector:
+    matchLabels:
+      run: kibana
+  template:
+    metadata:
+      labels:
+        run: kibana
+    spec:
+      initContainers:
+      - name: chown-data-dir
+        image: centos:7
+        args:
+          - /bin/bash
+          - -c
+          - until curl elasticsearch:9200; do echo waiting for elasticsearch; sleep 10; done
+      containers:
+      - name: kibana
+        imagePullPolicy: IfNotPresent
+        image: latonaio/kibana-arm64:7.7.0
+        resources:
+          limits:
+            memory: 300Mi
+            cpu: 150m
+          requests:
+            memory: 300Mi
+            cpu: 30m
+        env:
+        - name: ELASTICSEARCH_URL
+          value: http://elasticsearch:9200
+        ports:
+        - containerPort: 5601
+          name: http
+          protocol: TCP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+  labels:
+    service: kibana
+spec:
+  type: NodePort
+  selector:
+    run: kibana
+  ports:
+  - port: 5601
+    targetPort: 5601
+    nodePort: 30560

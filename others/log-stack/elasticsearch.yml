@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+spec:
+  selector:
+    matchLabels:
+      component: elasticsearch
+  template:
+    metadata:
+      labels:
+        component: elasticsearch
+    spec:
+      initContainers:
+      - name: chown-elasticsearch-persistent-storage
+        image: busybox
+        args:
+          - /bin/sh
+          - -c
+          - chown -R 1010:1010 /elasticsearch-7.7.0/data
+        volumeMounts:
+        - name: elasticsearch-persistent-storage
+          mountPath: /elasticsearch-7.7.0/data
+      containers:
+      - name: elasticsearch
+        imagePullPolicy: IfNotPresent
+        image: latonaio/elasticserch-arm64:v7.7.0
+        env:
+        - name: discovery.type
+          value: single-node
+        ports:
+        - containerPort: 9200
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 4Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        volumeMounts:
+        - name: elasticsearch-persistent-storage
+          mountPath: /elasticsearch-7.7.0/data
+      volumes:
+      - name: elasticsearch-persistent-storage
+        persistentVolumeClaim:
+          claimName: elasticsearch-pv-claim
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  labels:
+    component: elasticsearch
+spec:
+  type: NodePort
+  selector:
+    component: elasticsearch
+  ports:
+  - port: 9200
+    targetPort: 9200
+    nodePort: 30920

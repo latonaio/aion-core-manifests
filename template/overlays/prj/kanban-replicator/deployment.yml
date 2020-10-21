@@ -1,0 +1,14 @@
+# SERVICE BROKER GO
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aion-kanban-replicator
+spec:
+  template:
+    spec:
+      volumes:
+        - name: config
+          hostPath:
+            path: /var/lib/aion/prj/config
+status: {}

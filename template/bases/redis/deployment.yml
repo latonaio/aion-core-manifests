@@ -1,0 +1,33 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: redis-cluster
+spec:
+  selector:
+    matchLabels:
+      app: redis-cluster
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: redis-cluster
+    spec:
+      containers:
+        - image: redis:6.0-rc-alpine3.11
+          name: redis-cluster
+          args:
+            - --timeout
+            - "600"
+            - --loglevel
+            - "debug"
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: 100m
+            requests:
+              memory: 50Mi
+              cpu: 5m
+          ports:
+            - containerPort: 6379
+              name: redis-cluster

@@ -1,0 +1,8 @@
+namespace: default
+
+bases:
+  - ../../bases
+
+resources:
+  - mongo/pv.yml
+  - cluster-rolebinding.yml

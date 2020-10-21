@@ -1,0 +1,14 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: mongo-pv-volume-prj
+  labels:
+    type: local
+spec:
+  storageClassName: mongo
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/var/lib/aion/prj/mnt/mongo_data"

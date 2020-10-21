@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+spec:
+  selector:
+    matchLabels:
+      app: mongo
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+        - image: mongo:4.4
+          name: mongo
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: 100m
+            requests:
+              memory: 100Mi
+              cpu: 10m
+          env:
+            - name: MONGODB_USER
+              value: root
+            - name: MONGODB_PASS
+              value: root
+          ports:
+            - containerPort: 27017
+              name: mongo
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: /data/db
+      volumes:
+        - name: mongo-persistent-storage
+          persistentVolumeClaim:
+            claimName: mongo-pv-claim

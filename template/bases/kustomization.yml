@@ -1,0 +1,18 @@
+resources:
+  - kanban-replicator/deployment.yml
+  - kanban-replicator/envoy-configmap.yml
+  - mongo/deployment.yml
+  - mongo/pvc.yml
+  - mongo/service.yml
+  - redis/deployment.yml
+  - redis/service.yml
+  - send-anything/deployment.yml
+  - send-anything/service.yml
+  - send-anything/envoy-configmap.yml
+  - service-broker/deployment.yml
+  - service-broker/service.yml
+  - service-broker/envoy-configmap.yml
+  - status-kanban/deployment.yml
+  - status-kanban/service.yml
+  - status-kanban/envoy-configmap.yml
+  - common/service-account.yml

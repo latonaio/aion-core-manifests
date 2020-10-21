@@ -1,0 +1,26 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: grafana-pv-volume
+spec:
+  storageClassName: grafana-strage-class
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /var/lib/aion/grafana
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: grafana-pv-claim
+spec:
+  storageClassName: grafana-strage-class
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+

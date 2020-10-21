@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aion-servicebroker
+spec:
+  template:
+    spec:
+      containers:
+        - name: aion-servicebroker
+          env:
+            - name: NAMESPACE
+              value: prj
+            - name: REPOSITORY_PREFIX
+              value: localhost:31112
+      volumes:
+        - name: config
+          hostPath:
+            path: /var/lib/aion/prj/config

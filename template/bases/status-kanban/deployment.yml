@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: aion-statuskanban
+  name: aion-statuskanban
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: aion-statuskanban
+  strategy:
+    rollingUpdate:
+  template:
+    metadata:
+      labels:
+        run: aion-statuskanban
+    spec:
+      hostname: aion-statuskanban
+      shareProcessNamespace: true
+      imagePullSecrets:
+        - name: dockerhub
+      initContainers:
+        - name: check-connectivity-redis
+          image: redis:6.0-rc-alpine3.11
+          imagePullPolicy: IfNotPresent
+          args:
+            - /bin/sh
+            - -c
+            - until redis-cli -h redis-cluster -p 6379 SET connectivity true; do echo "wait..."; sleep 5; done
+      containers:
+        - name: aion-statuskanban
+          image: latonaio/aion-statuskanban:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: REDIS_HOST
+              value: redis-cluster:6379
+          ports:
+            - containerPort: 11010
+              name: grpc
+        - name: envoy
+          image: latonaio/envoy:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - "/usr/local/bin/envoy"
+          args:
+            - "-l"
+            - "debug"
+            - "--config-path"
+            - "/etc/envoy/envoy.yaml"
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 64Mi
+          ports:
+            - containerPort: 6379
+              name: envoy-redis
+            - containerPort: 10000
+              name: envoy-grpc
+            - containerPort: 10001
+              name: envoy-admin
+          volumeMounts:
+            - name: envoy
+              mountPath: /etc/envoy
+      volumes:
+        - name: envoy
+          configMap:
+            name: envoy-config-statuskanban
+status: {}
