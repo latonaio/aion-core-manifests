@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     run: aion-statuskanban
-  name: aion-statuskanban
+  name: aion-statuskanban-NODE-NAME
 spec:
   replicas: 1
   selector:
@@ -11,6 +11,7 @@ spec:
       run: aion-statuskanban
   strategy:
     rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -67,4 +68,6 @@ spec:
         - name: envoy
           configMap:
             name: envoy-config-statuskanban
+      nodeSelector:
+        kubernetes.io/hostname=: null
 status: {}

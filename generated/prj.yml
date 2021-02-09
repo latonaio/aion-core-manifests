@@ -400,6 +400,8 @@ spec:
       hostname: aion-kanban-replicator
       imagePullSecrets:
       - name: dockerhub
+      nodeSelector:
+        kubernetes.io/hostname=: null
       shareProcessNamespace: true
       volumes:
       - hostPath:
@@ -465,6 +467,8 @@ spec:
       hostname: aion-sendanything
       imagePullSecrets:
       - name: dockerhub
+      nodeSelector:
+        kubernetes.io/hostname=: null
       shareProcessNamespace: true
       volumes:
       - configMap:
@@ -549,6 +553,8 @@ spec:
         image: redis:6.0-rc-alpine3.11
         imagePullPolicy: IfNotPresent
         name: check-connectivity-redis
+      nodeSelector:
+        kubernetes.io/hostname=: null
       serviceAccountName: controller-serviceaccount
       shareProcessNamespace: true
       volumes:
@@ -626,6 +632,8 @@ spec:
         image: redis:6.0-rc-alpine3.11
         imagePullPolicy: IfNotPresent
         name: check-connectivity-redis
+      nodeSelector:
+        kubernetes.io/hostname=: null
       shareProcessNamespace: true
       volumes:
       - configMap:
@@ -670,15 +678,12 @@ spec:
         volumeMounts:
         - mountPath: /data/db
           name: mongo-persistent-storage
-        - mountPath: /dump
-          name: mongo-dump
+      nodeSelector:
+        kubernetes.io/hostname=: null
       volumes:
       - name: mongo-persistent-storage
         persistentVolumeClaim:
           claimName: mongo-pv-claim
-      - name: mongo-dump
-        hostPath:
-          path: /var/lib/aion/prj/mnt/mongo_dump
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -714,6 +719,8 @@ spec:
           requests:
             cpu: 5m
             memory: 50Mi
+      nodeSelector:
+        kubernetes.io/hostname=: null
 ---
 apiVersion: v1
 kind: PersistentVolume

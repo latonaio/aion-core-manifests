@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     run: aion-servicebroker
-  name: aion-servicebroker
+  name: aion-servicebroker-NODE-NAME
 spec:
   replicas: 1
   selector:
@@ -75,4 +75,6 @@ spec:
         - name: config
           hostPath:
             path: /var/lib/aion/default/config
+      nodeSelector:
+        kubernetes.io/hostname=: null
 status: {}

@@ -343,7 +343,7 @@ kind: Deployment
 metadata:
   labels:
     run: aion-kanban-replicator
-  name: aion-kanban-replicator
+  name: aion-kanban-replicator-NODE-NAME
   namespace: default
 spec:
   replicas: 1
@@ -351,7 +351,8 @@ spec:
     matchLabels:
       run: aion-kanban-replicator
   strategy:
-    rollingUpdate: null
+    rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -395,6 +396,8 @@ spec:
       hostname: aion-kanban-replicator
       imagePullSecrets:
       - name: dockerhub
+      nodeSelector:
+        kubernetes.io/hostname=: null
       shareProcessNamespace: true
       volumes:
       - hostPath:
@@ -410,7 +413,7 @@ kind: Deployment
 metadata:
   labels:
     run: aion-sendanything
-  name: aion-sendanything
+  name: aion-sendanything-NODE-NAME
   namespace: default
 spec:
   replicas: 1
@@ -418,7 +421,8 @@ spec:
     matchLabels:
       run: aion-sendanything
   strategy:
-    rollingUpdate: null
+    rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -457,6 +461,8 @@ spec:
       hostname: aion-sendanything
       imagePullSecrets:
       - name: dockerhub
+      nodeSelector:
+        kubernetes.io/hostname=: null
       shareProcessNamespace: true
       volumes:
       - configMap:
@@ -472,7 +478,7 @@ kind: Deployment
 metadata:
   labels:
     run: aion-servicebroker
-  name: aion-servicebroker
+  name: aion-servicebroker-NODE-NAME
   namespace: default
 spec:
   replicas: 1
@@ -537,6 +543,8 @@ spec:
         image: redis:6.0-rc-alpine3.11
         imagePullPolicy: IfNotPresent
         name: check-connectivity-redis
+      nodeSelector:
+        kubernetes.io/hostname=: null
       serviceAccountName: controller-serviceaccount
       shareProcessNamespace: true
       volumes:
@@ -553,7 +561,7 @@ kind: Deployment
 metadata:
   labels:
     run: aion-statuskanban
-  name: aion-statuskanban
+  name: aion-statuskanban-NODE-NAME
   namespace: default
 spec:
   replicas: 1
@@ -561,7 +569,8 @@ spec:
     matchLabels:
       run: aion-statuskanban
   strategy:
-    rollingUpdate: null
+    rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -614,6 +623,8 @@ spec:
         image: redis:6.0-rc-alpine3.11
         imagePullPolicy: IfNotPresent
         name: check-connectivity-redis
+      nodeSelector:
+        kubernetes.io/hostname=: null
       shareProcessNamespace: true
       volumes:
       - configMap:
@@ -624,7 +635,7 @@ status: {}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo
+  name: mongo-NODE-NAME
   namespace: default
 spec:
   selector:
@@ -658,6 +669,8 @@ spec:
         volumeMounts:
         - mountPath: /data/db
           name: mongo-persistent-storage
+      nodeSelector:
+        kubernetes.io/hostname=: null
       volumes:
       - name: mongo-persistent-storage
         persistentVolumeClaim:
@@ -666,7 +679,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis-cluster
+  name: redis-cluster-NODE-NAME
   namespace: default
 spec:
   selector:
@@ -697,6 +710,8 @@ spec:
           requests:
             cpu: 5m
             memory: 50Mi
+      nodeSelector:
+        kubernetes.io/hostname=: null
 ---
 apiVersion: v1
 kind: PersistentVolume

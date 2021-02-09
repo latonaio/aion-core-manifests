@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo
+  name: mongo-NODE-NAME
 spec:
   selector:
     matchLabels:
@@ -34,6 +34,8 @@ spec:
           volumeMounts:
             - name: mongo-persistent-storage
               mountPath: /data/db
+      nodeSelector:
+        kubernetes.io/hostname=: null
       volumes:
         - name: mongo-persistent-storage
           persistentVolumeClaim:

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     run: aion-sendanything
-  name: aion-sendanything
+  name: aion-sendanything-NODE-NAME
 spec:
   replicas: 1
   selector:
@@ -11,6 +11,7 @@ spec:
       run: aion-sendanything
   strategy:
     rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -50,6 +51,8 @@ spec:
           volumeMounts:
             - name: envoy
               mountPath: /etc/envoy
+      nodeSelector:
+        kubernetes.io/hostname=: null
       volumes:
         - name: envoy
           configMap:

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+/bin/sh ./clean-node-selector.sh
+
 kubectl apply \
 -f ./template/overlays/default/cluster-rolebinding.yml \
 -f ./template/bases/common \

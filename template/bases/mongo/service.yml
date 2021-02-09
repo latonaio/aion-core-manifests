@@ -10,3 +10,5 @@ spec:
       nodePort: 30017
   selector:
     app: mongo
+  topologyKeys:
+    - "kubernetes.io/hostname"

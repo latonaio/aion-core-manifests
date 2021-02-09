@@ -10,3 +10,5 @@ spec:
       nodePort: 30379
   selector:
     app: redis-cluster
+  topologyKeys:
+    - "kubernetes.io/hostname"
