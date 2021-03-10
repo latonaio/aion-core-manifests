@@ -1,4 +1,5 @@
 NODE-NAME = ""
+AION-MODE = ""
 
 .PHONY: build
 build:
@@ -7,7 +8,7 @@ build:
 
 .PHONY: apply-node
 apply-node: build-for-node
-	sh kubectl-apply-target-node.sh $(NODE-NAME)
+	sh kubectl-apply-target-node.sh $(NODE-NAME) $(AION-MODE)
 
 .PHONY: delete-node
 delete-node:
@@ -16,5 +17,9 @@ delete-node:
 .PHONY: build-for-node
 build-for-node:
 	mkdir -p generated/$(NODE-NAME)
-	kubectl kustomize template/overlays/default > generated/$(NODE-NAME)/default.yml
+	@if [ "$(AION-MODE)" = "master" ]; then \
+    kubectl kustomize template/overlays/master > generated/$(NODE-NAME)/default.yml ; \
+	else \
+	kubectl kustomize template/overlays/default > generated/$(NODE-NAME)/default.yml ; fi
 	#kubectl kustomize template/overlays/prj > generated/$(NODE-NAME)/prj.yml
+

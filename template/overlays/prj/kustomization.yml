@@ -10,9 +10,11 @@ patchesStrategicMerge:
   - kanban-replicator/deployment.yml
   - send-anything/service.yml
   - send-anything/deployment.yml
-  - service-broker/deployment.yml
 
 resources:
   - namespace.yml
   - mongo/pv.yml
   - cluster-rolebinding.yml
+  - service-broker/deployment.yml
+  - service-broker/envoy-configmap.yml
+  - service-broker/service.yml

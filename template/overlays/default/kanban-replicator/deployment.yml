@@ -1,50 +1,37 @@
+# SERVICE BROKER GO
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    run: aion-servicebroker
-  name: aion-servicebroker-NODE-NAME
+    run: aion-kanban-replicator
+  name: aion-kanban-replicator-NODE-NAME
 spec:
   replicas: 1
   selector:
     matchLabels:
-      run: aion-servicebroker
+      run: aion-kanban-replicator
   strategy:
-    type: Recreate
+    rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
-        run: aion-servicebroker
+        run: aion-kanban-replicator
     spec:
-      hostname: aion-servicebroker
+      hostname: aion-kanban-replicator
       shareProcessNamespace: true
       imagePullSecrets:
         - name: dockerhub
-      serviceAccountName: controller-serviceaccount
-      initContainers:
-        - name: check-connectivity-redis
-          image: redis:6.0-rc-alpine3.11
-          imagePullPolicy: IfNotPresent
-          args:
-            - /bin/sh
-            - -c
-            - until redis-cli -h redis-cluster -p 6379 SET connectivity true; do echo "wait..."; sleep 5; done
       containers:
-        - name: aion-servicebroker
-          image: latonaio/aion-servicebroker:latest
+        - name: aion-kanban-replicator
+          image: latonaio/aion-kanban-replicator:latest
           imagePullPolicy: IfNotPresent
-          resources:
-            limits:
-              cpu: 20m
-              memory: 128Mi
-            requests:
-              cpu: 5m
-              memory: 50Mi
           env:
             - name: REDIS_HOST
               value: redis-cluster:6379
-            - name: MODE
-              value: MODE-FOR-AION-CLUSTER
+            - name: MONGO_HOST
+              value: mongo:27017
           volumeMounts:
             - name: config
               mountPath: /var/lib/aion/config
@@ -54,13 +41,14 @@ spec:
           command:
             - "/usr/local/bin/envoy"
           args:
-            - "--config-path /etc/envoy/envoy.yaml"
+            - "-l"
+            - "debug"
+            - "--config-path"
+            - "/etc/envoy/envoy.yaml"
           resources:
             limits:
-              cpu: 20m
               memory: 512Mi
             requests:
-              cpu: 5m
               memory: 64Mi
           ports:
             - containerPort: 6379
@@ -71,12 +59,12 @@ spec:
             - name: envoy
               mountPath: /etc/envoy
       volumes:
-        - name: envoy
-          configMap:
-            name: envoy-config-servicebroker
         - name: config
           hostPath:
             path: /var/lib/aion/default/config
+        - name: envoy
+          configMap:
+            name: envoy-config-kanban-replicator
       nodeSelector:
         kubernetes.io/hostname=: null
 status: {}

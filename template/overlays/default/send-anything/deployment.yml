@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: aion-sendanything
+  name: aion-sendanything-NODE-NAME
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: aion-sendanything
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        run: aion-sendanything
+    spec:
+      hostname: aion-sendanything
+      shareProcessNamespace: true
+      imagePullSecrets:
+        - name: dockerhub
+      containers:
+        - name: aion-sendanything
+          image: latonaio/aion-sendanything:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 11011
+              name: grpc
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/aion
+        - name: envoy
+          image: latonaio/envoy:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - "/usr/local/bin/envoy"
+          args:
+            - "--config-path /etc/envoy/envoy.yaml"
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 64Mi
+          ports:
+            - containerPort: 10000
+              name: envoy-grpc
+            - containerPort: 10001
+              name: envoy-admin
+          volumeMounts:
+            - name: envoy
+              mountPath: /etc/envoy
+      nodeSelector:
+        kubernetes.io/hostname=: null
+      volumes:
+        - name: envoy
+          configMap:
+            name: envoy-config-sendanything
+        - name: data
+          hostPath:
+            path: /var/lib/aion/default
+status: {}

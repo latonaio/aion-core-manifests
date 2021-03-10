@@ -2,21 +2,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    run: aion-servicebroker
+    run: aion-servicebroker-master
   name: aion-servicebroker-NODE-NAME
 spec:
   replicas: 1
   selector:
     matchLabels:
-      run: aion-servicebroker
+      run: aion-servicebroker-master
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        run: aion-servicebroker
+        run: aion-servicebroker-master
     spec:
-      hostname: aion-servicebroker
+      hostname: aion-servicebroker-master
       shareProcessNamespace: true
       imagePullSecrets:
         - name: dockerhub
@@ -40,16 +40,19 @@ spec:
             requests:
               cpu: 5m
               memory: 50Mi
+          ports:
+            - containerPort: 11111
+              name: broker-server
           env:
             - name: REDIS_HOST
               value: redis-cluster:6379
             - name: MODE
-              value: MODE-FOR-AION-CLUSTER
+              value: master
           volumeMounts:
             - name: config
               mountPath: /var/lib/aion/config
         - name: envoy
-          image: latonaio/envoy:latest
+          image: envoyproxy/envoy:v1.14.1
           imagePullPolicy: IfNotPresent
           command:
             - "/usr/local/bin/envoy"
@@ -79,4 +82,3 @@ spec:
             path: /var/lib/aion/default/config
       nodeSelector:
         kubernetes.io/hostname=: null
-status: {}

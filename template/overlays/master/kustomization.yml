@@ -17,3 +17,13 @@ resources:
   - status-kanban/deployment.yml
   - status-kanban/service.yml
   - status-kanban/envoy-configmap.yml
+
+#patchesStrategicMerge:
+#  - service-broker/deployment.yml
+#  - service-broker/service.yml
+#  - path: service-broker/deployment.yml
+#    target:
+#      kind: deployment
+#  - path: service-broker/service.yml
+#    target:
+#      kind: service
