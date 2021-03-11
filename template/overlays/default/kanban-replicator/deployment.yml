@@ -32,9 +32,18 @@ spec:
               value: redis-cluster:6379
             - name: MONGO_HOST
               value: mongo:27017
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
           volumeMounts:
             - name: config
               mountPath: /var/lib/aion/config
+
         - name: envoy
           image: latonaio/envoy:latest
           imagePullPolicy: IfNotPresent

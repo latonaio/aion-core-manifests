@@ -31,6 +31,15 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /var/lib/aion
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
         - name: envoy
           image: envoyproxy/envoy:v1.14.1
           imagePullPolicy: IfNotPresent

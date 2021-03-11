@@ -48,6 +48,14 @@ spec:
               value: redis-cluster:6379
             - name: MODE
               value: master
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
           volumeMounts:
             - name: config
               mountPath: /var/lib/aion/config
