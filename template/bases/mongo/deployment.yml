@@ -32,11 +32,11 @@ spec:
             - containerPort: 27017
               name: mongo
           volumeMounts:
-            - name: mongo-persistent-storage
+            - name: mongo-persistent-storage-NODE-NAME
               mountPath: /data/db
       nodeSelector:
         kubernetes.io/hostname=: null
       volumes:
-        - name: mongo-persistent-storage
+        - name: mongo-persistent-storage-NODE-NAME
           persistentVolumeClaim:
-            claimName: mongo-pv-claim
+            claimName: mongo-pv-claim-NODE-NAME

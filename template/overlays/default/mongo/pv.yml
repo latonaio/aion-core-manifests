@@ -1,11 +1,11 @@
 kind: PersistentVolume
 apiVersion: v1
 metadata:
-  name: mongo-pv-volume-default
+  name: mongo-pv-volume-default-NODE-NAME
   labels:
     type: local
 spec:
-  storageClassName: mongo
+  storageClassName: mongo-NODE-NAME
   capacity:
     storage: 5Gi
   accessModes:
