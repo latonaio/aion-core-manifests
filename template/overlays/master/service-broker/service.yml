@@ -13,6 +13,7 @@ spec:
       port: 11110
       protocol: TCP
       targetPort: 11110
+      nodePort: 31110
     - name: envoy-admin
       port: 10001
       protocol: TCP
