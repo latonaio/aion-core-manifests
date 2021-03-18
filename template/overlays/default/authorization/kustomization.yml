@@ -1,0 +1,4 @@
+namespace: default
+nameSuffix: -default
+bases:
+  - ../../../bases/authorization

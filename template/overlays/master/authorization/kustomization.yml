@@ -1,0 +1,4 @@
+namespace: master
+nameSuffix: -master
+bases:
+  - ../../../bases/authorization

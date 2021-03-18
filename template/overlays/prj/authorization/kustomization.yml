@@ -1,0 +1,4 @@
+namespace: prj
+nameSuffix: -prj
+bases:
+  - ../../../bases/authorization

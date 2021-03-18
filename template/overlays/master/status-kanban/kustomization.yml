@@ -1,0 +1,6 @@
+namespace: master
+bases:
+- ../../../bases/status-kanban
+patchesStrategicMerge:
+- ./deployment.yml
+- ./service.yml

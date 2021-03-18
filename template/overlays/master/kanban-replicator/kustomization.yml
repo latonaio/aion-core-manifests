@@ -1,0 +1,5 @@
+namespace: master
+bases:
+- ../../../bases/kanban-replicator
+patchesStrategicMerge:
+- ./deployment.yml

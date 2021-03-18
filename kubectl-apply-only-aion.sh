@@ -4,8 +4,6 @@ kubectl create secret generic dockerhub \
     --from-file=.dockerconfigjson=$HOME/.docker/config.json \
     --type=kubernetes.io/dockerconfigjson
 
-/bin/sh ./clean-node-selector.sh
-
 kubectl apply \
 -f ./template/overlays/default/cluster-rolebinding.yml \
 -f ./template/bases/common \

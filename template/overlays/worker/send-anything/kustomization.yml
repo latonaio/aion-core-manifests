@@ -1,0 +1,6 @@
+namespace: _HOSTNAME_
+bases:
+- ../../../bases/send-anything
+patchesStrategicMerge:
+- ./deployment.yml
+- ./service.yml

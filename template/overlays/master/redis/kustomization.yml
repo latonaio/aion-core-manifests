@@ -1,0 +1,6 @@
+namespace: master
+bases:
+- ../../../bases/redis
+patchesStrategicMerge:
+- ./deployment.yml
+- ./service.yml

@@ -1,0 +1,4 @@
+namespace: _HOSTNAME_
+nameSuffix: -_HOSTNAME_
+bases:
+  - ../../../bases/authorization

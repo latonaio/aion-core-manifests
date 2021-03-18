@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     run: aion-statuskanban
-  name: aion-statuskanban-NODE-NAME
+  name: aion-statuskanban
 spec:
   replicas: 1
   selector:
@@ -36,6 +36,14 @@ spec:
           env:
             - name: REDIS_HOST
               value: redis-cluster:6379
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
           ports:
             - containerPort: 11010
               name: grpc
@@ -68,6 +76,3 @@ spec:
         - name: envoy
           configMap:
             name: envoy-config-statuskanban
-      nodeSelector:
-        kubernetes.io/hostname=: null
-status: {}

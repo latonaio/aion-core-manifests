@@ -1,0 +1,4 @@
+bases:
+- ../../../bases/kanban-replicator
+patchesStrategicMerge:
+- ./deployment.yml

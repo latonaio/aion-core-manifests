@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aion-servicebroker
+spec:
+  template:
+    spec:
+      serviceAccountName: aion-_HOSTNAME_
+      containers:
+        - name: aion-servicebroker
+          env:
+            - name: NAMESPACE
+              value: _HOSTNAME_
+            - name: MODE
+              value: worker
+            - name: REPOSITORY_PREFIX
+              value: latonaio
+      volumes:
+        - name: config
+          hostPath:
+            path: /var/lib/aion/default/config
+      nodeSelector:
+        kubernetes.io/hostname=: _HOSTNAME_

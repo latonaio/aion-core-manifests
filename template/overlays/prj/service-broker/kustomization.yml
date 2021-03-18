@@ -1,0 +1,5 @@
+namespace: prj
+bases:
+- ../../../bases/service-broker
+patchesStrategicMerge:
+- ./deployment.yml

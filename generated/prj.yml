@@ -1,25 +1,20 @@
 apiVersion: v1
-kind: Namespace
-metadata:
-  name: prj
----
-apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: controller-serviceaccount
+  name: aion-prj
   namespace: prj
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: clusterrolebinding-prj
+  name: aion-prj
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: cluster-admin
 subjects:
 - kind: ServiceAccount
-  name: controller-serviceaccount
+  name: aion-prj
   namespace: prj
 ---
 apiVersion: v1
@@ -322,12 +317,11 @@ metadata:
   namespace: prj
 spec:
   ports:
-  - nodePort: 31017
-    port: 27017
+  - port: 27017
     targetPort: 27017
   selector:
     app: mongo
-  type: NodePort
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -336,12 +330,11 @@ metadata:
   namespace: prj
 spec:
   ports:
-  - nodePort: 31379
-    port: 6379
+  - port: 6379
     targetPort: 6379
   selector:
     app: redis-cluster
-  type: NodePort
+  type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -356,7 +349,8 @@ spec:
     matchLabels:
       run: aion-kanban-replicator
   strategy:
-    rollingUpdate: null
+    rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -368,6 +362,14 @@ spec:
           value: redis-cluster:6379
         - name: MONGO_HOST
           value: mongo:27017
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
         image: latonaio/aion-kanban-replicator:latest
         imagePullPolicy: IfNotPresent
         name: aion-kanban-replicator
@@ -400,8 +402,6 @@ spec:
       hostname: aion-kanban-replicator
       imagePullSecrets:
       - name: dockerhub
-      nodeSelector:
-        kubernetes.io/hostname=: null
       shareProcessNamespace: true
       volumes:
       - hostPath:
@@ -410,7 +410,6 @@ spec:
       - configMap:
           name: envoy-config-kanban-replicator
         name: envoy
-status: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -425,7 +424,8 @@ spec:
     matchLabels:
       run: aion-sendanything
   strategy:
-    rollingUpdate: null
+    rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -435,6 +435,14 @@ spec:
       - env:
         - name: CLIENT_PORT
           value: "31100"
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
         image: latonaio/aion-sendanything:latest
         imagePullPolicy: IfNotPresent
         name: aion-sendanything
@@ -467,8 +475,6 @@ spec:
       hostname: aion-sendanything
       imagePullSecrets:
       - name: dockerhub
-      nodeSelector:
-        kubernetes.io/hostname=: null
       shareProcessNamespace: true
       volumes:
       - configMap:
@@ -477,7 +483,6 @@ spec:
       - hostPath:
           path: /var/lib/aion/prj
         name: data
-status: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -506,6 +511,16 @@ spec:
           value: localhost:31112
         - name: REDIS_HOST
           value: redis-cluster:6379
+        - name: MODE
+          value: default
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
         image: latonaio/aion-servicebroker:latest
         imagePullPolicy: IfNotPresent
         name: aion-servicebroker
@@ -553,9 +568,7 @@ spec:
         image: redis:6.0-rc-alpine3.11
         imagePullPolicy: IfNotPresent
         name: check-connectivity-redis
-      nodeSelector:
-        kubernetes.io/hostname=: null
-      serviceAccountName: controller-serviceaccount
+      serviceAccountName: aion-prj
       shareProcessNamespace: true
       volumes:
       - configMap:
@@ -564,7 +577,6 @@ spec:
       - hostPath:
           path: /var/lib/aion/prj/config
         name: config
-status: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -579,7 +591,8 @@ spec:
     matchLabels:
       run: aion-statuskanban
   strategy:
-    rollingUpdate: null
+    rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -589,6 +602,14 @@ spec:
       - env:
         - name: REDIS_HOST
           value: redis-cluster:6379
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
         image: latonaio/aion-statuskanban:latest
         imagePullPolicy: IfNotPresent
         name: aion-statuskanban
@@ -632,14 +653,11 @@ spec:
         image: redis:6.0-rc-alpine3.11
         imagePullPolicy: IfNotPresent
         name: check-connectivity-redis
-      nodeSelector:
-        kubernetes.io/hostname=: null
       shareProcessNamespace: true
       volumes:
       - configMap:
           name: envoy-config-statuskanban
         name: envoy
-status: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -678,8 +696,6 @@ spec:
         volumeMounts:
         - mountPath: /data/db
           name: mongo-persistent-storage
-      nodeSelector:
-        kubernetes.io/hostname=: null
       volumes:
       - name: mongo-persistent-storage
         persistentVolumeClaim:
@@ -719,8 +735,6 @@ spec:
           requests:
             cpu: 5m
             memory: 50Mi
-      nodeSelector:
-        kubernetes.io/hostname=: null
 ---
 apiVersion: v1
 kind: PersistentVolume

@@ -1,0 +1,9 @@
+namespace: master
+bases:
+- ../../../bases/mongo
+resources:
+- ./pv.yml
+patchesStrategicMerge:
+- ./pvc.yml
+- ./deployment.yml
+- ./service.yml

@@ -1,25 +1,34 @@
-NODE-NAME = ""
-AION-MODE = ""
+HOST= ""
 
 .PHONY: build
 build:
 	kubectl kustomize template/overlays/default > generated/default.yml
-	#kubectl kustomize template/overlays/prj > generated/prj.yml
+	kubectl kustomize template/overlays/prj > generated/prj.yml
 
-.PHONY: apply-node
-apply-node: build-for-node
-	sh kubectl-apply-target-node.sh $(NODE-NAME) $(AION-MODE)
+.PHONY: apply-worker
+apply-worker:
+	sh kubectl-apply-target-node.sh $(HOST)
 
-.PHONY: delete-node
-delete-node:
-	sh kubectl-delete-target-node.sh $(NODE-NAME)
+.PHONY: apply-master
+apply-master:
+	sh kubectl-apply-target-node.sh master
 
-.PHONY: build-for-node
-build-for-node:
-	mkdir -p generated/$(NODE-NAME)
-	@if [ "$(AION-MODE)" = "master" ]; then \
-    kubectl kustomize template/overlays/master > generated/$(NODE-NAME)/default.yml ; \
-	else \
-	kubectl kustomize template/overlays/default > generated/$(NODE-NAME)/default.yml ; fi
-	#kubectl kustomize template/overlays/prj > generated/$(NODE-NAME)/prj.yml
+.PHONY: delete-worker
+delete-worker:
+	sh kubectl-delete-target-node.sh $(HOST)
 
+.PHONY: delete-worker
+delete-master:
+	sh kubectl-delete-target-node.sh master
+
+.PHONY: build-worker
+build-worker:
+	mkdir -p generated/$(HOST)
+	kubectl kustomize template/overlays/worker > generated/$(HOST)/default.yml
+	sed -i -e "s/_HOSTNAME_/$(HOST)/g" generated/$(HOST)/default.yml
+
+.PHONY: build-master
+build-master:
+	mkdir -p generated/master
+	kubectl kustomize template/overlays/master > generated/master/default.yml
+	sed -i -e "s/_HOSTNAME_/$(HOST)/g" generated/master/default.yml

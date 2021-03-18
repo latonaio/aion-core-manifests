@@ -17,5 +17,3 @@ spec:
       port: 10001
       protocol: TCP
       targetPort: 10001
-  topologyKeys:
-    - "kubernetes.io/hostname"

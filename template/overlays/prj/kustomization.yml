@@ -1,20 +1,8 @@
-namespace: prj
-
 bases:
-  - ../../bases
-
-patchesStrategicMerge:
-  - mongo/service.yml
-  - mongo/pvc.yml
-  - redis/service.yml
-  - kanban-replicator/deployment.yml
-  - send-anything/service.yml
-  - send-anything/deployment.yml
-
-resources:
-  - namespace.yml
-  - mongo/pv.yml
-  - cluster-rolebinding.yml
-  - service-broker/deployment.yml
-  - service-broker/envoy-configmap.yml
-  - service-broker/service.yml
+- ./authorization
+- ./redis
+- ./mongo
+- ./service-broker
+- ./status-kanban
+- ./kanban-replicator
+- ./send-anything

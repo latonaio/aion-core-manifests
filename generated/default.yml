@@ -1,20 +1,20 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: controller-serviceaccount
+  name: aion-default
   namespace: default
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: clusterrolebinding-default
+  name: aion-default
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: cluster-admin
 subjects:
 - kind: ServiceAccount
-  name: controller-serviceaccount
+  name: aion-default
   namespace: default
 ---
 apiVersion: v1
@@ -317,12 +317,11 @@ metadata:
   namespace: default
 spec:
   ports:
-  - nodePort: 30017
-    port: 27017
+  - port: 27017
     targetPort: 27017
   selector:
     app: mongo
-  type: NodePort
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -331,19 +330,18 @@ metadata:
   namespace: default
 spec:
   ports:
-  - nodePort: 30379
-    port: 6379
+  - port: 6379
     targetPort: 6379
   selector:
     app: redis-cluster
-  type: NodePort
+  type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     run: aion-kanban-replicator
-  name: aion-kanban-replicator-NODE-NAME
+  name: aion-kanban-replicator
   namespace: default
 spec:
   replicas: 1
@@ -364,6 +362,14 @@ spec:
           value: redis-cluster:6379
         - name: MONGO_HOST
           value: mongo:27017
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
         image: latonaio/aion-kanban-replicator:latest
         imagePullPolicy: IfNotPresent
         name: aion-kanban-replicator
@@ -396,8 +402,6 @@ spec:
       hostname: aion-kanban-replicator
       imagePullSecrets:
       - name: dockerhub
-      nodeSelector:
-        kubernetes.io/hostname=: null
       shareProcessNamespace: true
       volumes:
       - hostPath:
@@ -406,14 +410,13 @@ spec:
       - configMap:
           name: envoy-config-kanban-replicator
         name: envoy
-status: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     run: aion-sendanything
-  name: aion-sendanything-NODE-NAME
+  name: aion-sendanything
   namespace: default
 spec:
   replicas: 1
@@ -429,7 +432,18 @@ spec:
         run: aion-sendanything
     spec:
       containers:
-      - image: latonaio/aion-sendanything:latest
+      - env:
+        - name: CLIENT_PORT
+          value: "30100"
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        image: latonaio/aion-sendanything:latest
         imagePullPolicy: IfNotPresent
         name: aion-sendanything
         ports:
@@ -461,8 +475,6 @@ spec:
       hostname: aion-sendanything
       imagePullSecrets:
       - name: dockerhub
-      nodeSelector:
-        kubernetes.io/hostname=: null
       shareProcessNamespace: true
       volumes:
       - configMap:
@@ -471,14 +483,13 @@ spec:
       - hostPath:
           path: /var/lib/aion/default
         name: data
-status: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     run: aion-servicebroker
-  name: aion-servicebroker-NODE-NAME
+  name: aion-servicebroker
   namespace: default
 spec:
   replicas: 1
@@ -494,8 +505,22 @@ spec:
     spec:
       containers:
       - env:
+        - name: NAMESPACE
+          value: default
+        - name: REPOSITORY_PREFIX
+          value: latonaio
         - name: REDIS_HOST
           value: redis-cluster:6379
+        - name: MODE
+          value: default
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
         image: latonaio/aion-servicebroker:latest
         imagePullPolicy: IfNotPresent
         name: aion-servicebroker
@@ -543,9 +568,7 @@ spec:
         image: redis:6.0-rc-alpine3.11
         imagePullPolicy: IfNotPresent
         name: check-connectivity-redis
-      nodeSelector:
-        kubernetes.io/hostname=: null
-      serviceAccountName: controller-serviceaccount
+      serviceAccountName: aion-default
       shareProcessNamespace: true
       volumes:
       - configMap:
@@ -554,14 +577,13 @@ spec:
       - hostPath:
           path: /var/lib/aion/default/config
         name: config
-status: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     run: aion-statuskanban
-  name: aion-statuskanban-NODE-NAME
+  name: aion-statuskanban
   namespace: default
 spec:
   replicas: 1
@@ -580,6 +602,14 @@ spec:
       - env:
         - name: REDIS_HOST
           value: redis-cluster:6379
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
         image: latonaio/aion-statuskanban:latest
         imagePullPolicy: IfNotPresent
         name: aion-statuskanban
@@ -623,19 +653,16 @@ spec:
         image: redis:6.0-rc-alpine3.11
         imagePullPolicy: IfNotPresent
         name: check-connectivity-redis
-      nodeSelector:
-        kubernetes.io/hostname=: null
       shareProcessNamespace: true
       volumes:
       - configMap:
           name: envoy-config-statuskanban
         name: envoy
-status: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo-NODE-NAME
+  name: mongo
   namespace: default
 spec:
   selector:
@@ -669,8 +696,6 @@ spec:
         volumeMounts:
         - mountPath: /data/db
           name: mongo-persistent-storage
-      nodeSelector:
-        kubernetes.io/hostname=: null
       volumes:
       - name: mongo-persistent-storage
         persistentVolumeClaim:
@@ -679,7 +704,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis-cluster-NODE-NAME
+  name: redis-cluster
   namespace: default
 spec:
   selector:
@@ -710,8 +735,6 @@ spec:
           requests:
             cpu: 5m
             memory: 50Mi
-      nodeSelector:
-        kubernetes.io/hostname=: null
 ---
 apiVersion: v1
 kind: PersistentVolume

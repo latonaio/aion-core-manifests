@@ -1,0 +1,6 @@
+namespace: prj
+bases:
+- ../../../bases/send-anything
+patchesStrategicMerge:
+- ./deployment.yml
+- ./service.yml

@@ -3,12 +3,9 @@ kind: Service
 metadata:
   name: redis-cluster
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
     - port: 6379
       targetPort: 6379
-      nodePort: 30379
   selector:
     app: redis-cluster
-  topologyKeys:
-    - "kubernetes.io/hostname"

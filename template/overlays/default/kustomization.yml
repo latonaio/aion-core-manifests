@@ -1,19 +1,10 @@
 namespace: default
 
 bases:
-  - ../../bases
-
-resources:
-  - service-broker/deployment.yml
-  - service-broker/service.yml
-  - service-broker/envoy-configmap.yml
-  - mongo/pv.yml
-  - cluster-rolebinding.yml
-  - kanban-replicator/deployment.yml
-  - kanban-replicator/envoy-configmap.yml
-  - send-anything/deployment.yml
-  - send-anything/service.yml
-  - send-anything/envoy-configmap.yml
-  - status-kanban/deployment.yml
-  - status-kanban/service.yml
-  - status-kanban/envoy-configmap.yml
+- ./authorization
+- ./redis
+- ./mongo
+- ./service-broker
+- ./status-kanban
+- ./kanban-replicator
+- ./send-anything

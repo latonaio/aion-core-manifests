@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo-NODE-NAME
+  name: mongo
 spec:
   selector:
     matchLabels:
@@ -32,11 +32,9 @@ spec:
             - containerPort: 27017
               name: mongo
           volumeMounts:
-            - name: mongo-persistent-storage-NODE-NAME
+            - name: mongo-persistent-storage
               mountPath: /data/db
-      nodeSelector:
-        kubernetes.io/hostname=: null
       volumes:
-        - name: mongo-persistent-storage-NODE-NAME
+        - name: mongo-persistent-storage
           persistentVolumeClaim:
-            claimName: mongo-pv-claim-NODE-NAME
+            claimName: mongo-pv-claim

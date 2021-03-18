@@ -1,0 +1,6 @@
+bases:
+- ../../../bases/mongo
+resources:
+- ./pv.yml
+patchesStrategicMerge:
+- ./pvc.yml

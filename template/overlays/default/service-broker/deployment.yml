@@ -1,91 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    run: aion-servicebroker
-  name: aion-servicebroker-NODE-NAME
+  name: aion-servicebroker
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      run: aion-servicebroker
-  strategy:
-    type: Recreate
   template:
-    metadata:
-      labels:
-        run: aion-servicebroker
     spec:
-      hostname: aion-servicebroker
-      shareProcessNamespace: true
-      imagePullSecrets:
-        - name: dockerhub
-      serviceAccountName: controller-serviceaccount
-      initContainers:
-        - name: check-connectivity-redis
-          image: redis:6.0-rc-alpine3.11
-          imagePullPolicy: IfNotPresent
-          args:
-            - /bin/sh
-            - -c
-            - until redis-cli -h redis-cluster -p 6379 SET connectivity true; do echo "wait..."; sleep 5; done
+      serviceAccountName: aion-default
       containers:
         - name: aion-servicebroker
-          image: latonaio/aion-servicebroker:latest
-          imagePullPolicy: IfNotPresent
-          resources:
-            limits:
-              cpu: 20m
-              memory: 128Mi
-            requests:
-              cpu: 5m
-              memory: 50Mi
           env:
-            - name: REDIS_HOST
-              value: redis-cluster:6379
-            - name: MODE
-              value: MODE-FOR-AION-CLUSTER
-            - name: NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-            - name: NODE_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
-
-          volumeMounts:
-            - name: config
-              mountPath: /var/lib/aion/config
-        - name: envoy
-          image: latonaio/envoy:latest
-          imagePullPolicy: IfNotPresent
-          command:
-            - "/usr/local/bin/envoy"
-          args:
-            - "--config-path /etc/envoy/envoy.yaml"
-          resources:
-            limits:
-              cpu: 20m
-              memory: 512Mi
-            requests:
-              cpu: 5m
-              memory: 64Mi
-          ports:
-            - containerPort: 6379
-              name: envoy-redis
-            - containerPort: 10001
-              name: envoy-admin
-          volumeMounts:
-            - name: envoy
-              mountPath: /etc/envoy
+            - name: NAMESPACE
+              value: default
+            - name: REPOSITORY_PREFIX
+              value: latonaio
       volumes:
-        - name: envoy
-          configMap:
-            name: envoy-config-servicebroker
         - name: config
           hostPath:
             path: /var/lib/aion/default/config
-      nodeSelector:
-        kubernetes.io/hostname=: null
-status: {}

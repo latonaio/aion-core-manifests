@@ -1,0 +1,4 @@
+resources:
+- deployment.yml
+- envoy-configmap.yml
+- service.yml

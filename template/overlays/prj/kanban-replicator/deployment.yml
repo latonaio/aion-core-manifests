@@ -1,5 +1,4 @@
 # SERVICE BROKER GO
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -11,4 +10,3 @@ spec:
         - name: config
           hostPath:
             path: /var/lib/aion/prj/config
-status: {}

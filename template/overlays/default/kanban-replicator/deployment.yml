@@ -1,79 +1,12 @@
 # SERVICE BROKER GO
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    run: aion-kanban-replicator
-  name: aion-kanban-replicator-NODE-NAME
+  name: aion-kanban-replicator
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      run: aion-kanban-replicator
-  strategy:
-    rollingUpdate:
-      maxUnavailable: 1
   template:
-    metadata:
-      labels:
-        run: aion-kanban-replicator
     spec:
-      hostname: aion-kanban-replicator
-      shareProcessNamespace: true
-      imagePullSecrets:
-        - name: dockerhub
-      containers:
-        - name: aion-kanban-replicator
-          image: latonaio/aion-kanban-replicator:latest
-          imagePullPolicy: IfNotPresent
-          env:
-            - name: REDIS_HOST
-              value: redis-cluster:6379
-            - name: MONGO_HOST
-              value: mongo:27017
-            - name: NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-            - name: NODE_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
-          volumeMounts:
-            - name: config
-              mountPath: /var/lib/aion/config
-
-        - name: envoy
-          image: latonaio/envoy:latest
-          imagePullPolicy: IfNotPresent
-          command:
-            - "/usr/local/bin/envoy"
-          args:
-            - "-l"
-            - "debug"
-            - "--config-path"
-            - "/etc/envoy/envoy.yaml"
-          resources:
-            limits:
-              memory: 512Mi
-            requests:
-              memory: 64Mi
-          ports:
-            - containerPort: 6379
-              name: envoy-redis
-            - containerPort: 10001
-              name: envoy-admin
-          volumeMounts:
-            - name: envoy
-              mountPath: /etc/envoy
       volumes:
         - name: config
           hostPath:
             path: /var/lib/aion/default/config
-        - name: envoy
-          configMap:
-            name: envoy-config-kanban-replicator
-      nodeSelector:
-        kubernetes.io/hostname=: null
-status: {}
