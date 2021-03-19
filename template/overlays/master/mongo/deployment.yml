@@ -6,4 +6,4 @@ spec:
   template:
     spec:
       nodeSelector:
-        kubernetes.io/hostname=: _HOSTNAME_
+        kubernetes.io/hostname: _HOSTNAME_

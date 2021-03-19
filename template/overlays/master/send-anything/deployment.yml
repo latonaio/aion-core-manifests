@@ -15,4 +15,4 @@ spec:
           hostPath:
             path: /var/lib/aion/default
       nodeSelector:
-        kubernetes.io/hostname=: _HOSTNAME_
+        kubernetes.io/hostname: _HOSTNAME_
