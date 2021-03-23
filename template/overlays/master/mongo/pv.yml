@@ -1,14 +1,23 @@
 kind: PersistentVolume
 apiVersion: v1
 metadata:
-  name: mongo-pv-volume-default
+  name: mongo-pv-volume-_HOSTNAME_
   labels:
     type: local
+  namespace: _HOSTNAME_
 spec:
   storageClassName: mongo
   capacity:
     storage: 5Gi
   accessModes:
     - ReadWriteOnce
-  hostPath:
-    path: "/var/lib/aion/default/mnt/mongo_data"
+  local:
+    path: "/var/lib/aion/_HOSTNAME_/mnt/mongo_data"
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - _HOSTNAME_

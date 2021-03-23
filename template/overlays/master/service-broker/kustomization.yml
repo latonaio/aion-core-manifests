@@ -1,6 +1,9 @@
 namespace: master
 bases:
 - ../../../bases/service-broker
+
 patchesStrategicMerge:
 - ./deployment.yml
 - ./service.yml
+- ./envoy-configmap.yml
+

@@ -11,6 +11,8 @@ apply-worker:
 
 .PHONY: apply-master
 apply-master:
+	docker pull envoyproxy/envoy:v1.14.1
+	docker tag envoyproxy/envoy:v1.14.1 latonaio/envoy:latest
 	sh kubectl-apply-target-node.sh master
 
 .PHONY: delete-worker
@@ -26,9 +28,11 @@ build-worker:
 	mkdir -p generated/$(HOST)
 	kubectl kustomize template/overlays/worker > generated/$(HOST)/default.yml
 	sed -i -e "s/_HOSTNAME_/$(HOST)/g" generated/$(HOST)/default.yml
+	mkdir -p /var/lib/aion/$(HOST)/mnt/mongo_data
 
 .PHONY: build-master
 build-master:
 	mkdir -p generated/master
 	kubectl kustomize template/overlays/master > generated/master/default.yml
 	sed -i -e "s/_HOSTNAME_/$(HOST)/g" generated/master/default.yml
+	sudo mkdir -p /var/lib/aion/$(HOST)/mnt/mongo_data

@@ -7,3 +7,7 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/hostname: _HOSTNAME_
+      volumes:
+        - name: mongo-persistent-storage
+          persistentVolumeClaim:
+            claimName: mongo-pv-claim

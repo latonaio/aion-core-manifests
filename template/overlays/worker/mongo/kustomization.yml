@@ -4,6 +4,6 @@ bases:
 resources:
 - ./pv.yml
 patchesStrategicMerge:
-- ./pvc.yml
+#- ./pvc.yml
 - ./deployment.yml
 - ./service.yml
