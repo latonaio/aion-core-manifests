@@ -31,6 +31,8 @@ data:
                       grpc: {}
                     route:
                       cluster: status_kanban_grpc
+                      timeout: 0s
+                      idle_timeout: 0s
               http_filters:
               - name: envoy.filters.http.router
                 typed_config: {}

@@ -192,6 +192,8 @@ data:
                       grpc: {}
                     route:
                       cluster: status_kanban_grpc
+                      timeout: 0s
+                      idle_timeout: 0s
               http_filters:
               - name: envoy.filters.http.router
                 typed_config: {}
@@ -298,6 +300,10 @@ metadata:
   namespace: default
 spec:
   ports:
+  - name: grpc
+    port: 11010
+    protocol: TCP
+    targetPort: 11010
   - name: envoy-grpc
     port: 10000
     protocol: TCP

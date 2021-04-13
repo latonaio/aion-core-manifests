@@ -9,6 +9,10 @@ spec:
     run: aion-statuskanban
   type: ClusterIP
   ports:
+    - name: grpc
+      port: 11010
+      protocol: TCP
+      targetPort: 11010
     - name: envoy-grpc
       port: 10000
       protocol: TCP
