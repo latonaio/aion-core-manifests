@@ -76,6 +76,8 @@ spec:
               name: envoy-redis
             - containerPort: 10001
               name: envoy-admin
+            - containerPort: 10000
+              name: envoy-grpc
           volumeMounts:
             - name: envoy
               mountPath: /etc/envoy

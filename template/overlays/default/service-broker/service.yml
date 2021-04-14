@@ -7,11 +7,10 @@ metadata:
 spec:
   selector:
     run: aion-servicebroker
-  type: ClusterIP
+  type: NodePort
   ports:
-    - name: envoy-admin
-      port: 10001
+    - name: envoy-grpc
+      port: 10000
       protocol: TCP
-      targetPort: 10001
-  topologyKeys:
-    - "kubernetes.io/hostname"
+      targetPort: 10000
+      nodePort: 31000

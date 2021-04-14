@@ -92,6 +92,8 @@ data:
                       grpc: {}
                     route:
                       cluster: send_anything_grpc
+                      timeout: 0s
+                      idle_timeout: 0s
               http_filters:
               - name: envoy.filters.http.router
                 typed_config: {}
@@ -123,45 +125,33 @@ metadata:
 ---
 apiVersion: v1
 data:
-  envoy.yaml: |
-    static_resources:
-      listeners:
-      - name: redis_listener
-        address:
-          socket_address:
-            address: 0.0.0.0
-            port_value: 1999
-        filter_chains:
-        - filters:
-          - name: envoy.filters.network.redis_proxy
-            typed_config:
-              "@type": type.googleapis.com/envoy.config.filter.network.redis_proxy.v2.RedisProxy
-              stat_prefix: egress_redis
-              settings:
-                op_timeout: 5s
-              prefix_routes:
-                catch_all_route:
-                  cluster: redis_cluster
-      clusters:
-      - name: redis_cluster
-        connect_timeout: 1s
-        type: strict_dns # static
-        lb_policy: MAGLEV
-        load_assignment:
-          cluster_name: redis_cluster
-          endpoints:
-          - lb_endpoints:
-            - endpoint:
-                address:
-                  socket_address:
-                    address: redis
-                    port_value: 6379
-    admin:
-      access_log_path: /tmp/admin_access.log
-      address:
-        socket_address:
-          address: 0.0.0.0
-          port_value: 10001
+  envoy.yaml: "static_resources:\n  listeners:\n  - name: grpc_listener\n    address:\n
+    \     socket_address:\n        address: 0.0.0.0\n        port_value: 10000\n    filter_chains:\n
+    \   - filters:\n      - name: envoy.filters.network.http_connection_manager\n
+    \       typed_config:\n          \"@type\": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager\n
+    \         codec_type: auto\n          stat_prefix: ingress_http\n          stream_idle_timeout:
+    0s\n          route_config:\n            name: local_route\n            virtual_hosts:\n
+    \           - name: status_kanban_grpc\n              domains:\n              -
+    \"*\"\n              routes:\n              - match:\n                  prefix:
+    \"/\"\n                  grpc: {}\n                route:\n                  cluster:
+    service_broker_grpc \n                  timeout: 0s\n                  idle_timeout:
+    0s\n          http_filters:\n          - name: envoy.filters.http.router\n            typed_config:
+    {}\n  - name: redis_listener\n    address:\n      socket_address:\n        address:
+    0.0.0.0\n        port_value: 1999\n    filter_chains:\n    - filters:\n      -
+    name: envoy.filters.network.redis_proxy\n        typed_config:\n          \"@type\":
+    type.googleapis.com/envoy.config.filter.network.redis_proxy.v2.RedisProxy\n          stat_prefix:
+    egress_redis\n          settings:\n            op_timeout: 5s\n          prefix_routes:\n
+    \           catch_all_route:\n              cluster: redis_cluster\n  clusters:\n
+    \ - name: redis_cluster\n    connect_timeout: 1s\n    type: strict_dns # static\n
+    \   lb_policy: MAGLEV\n    load_assignment:\n      cluster_name: redis_cluster\n
+    \     endpoints:\n      - lb_endpoints:\n        - endpoint:\n            address:\n
+    \             socket_address:\n                address: redis\n                port_value:
+    6379\n  - name: service_broker_grpc\n    connect_timeout: 0.250s\n    type: strict_dns\n
+    \   lb_policy: round_robin\n    http2_protocol_options: {}\n    load_assignment:\n
+    \     cluster_name: status_kanban_grpc\n      endpoints:\n      - lb_endpoints:\n
+    \       - endpoint:\n            address:\n              socket_address:\n                address:
+    127.0.0.1\n                port_value: 11111\nadmin:\n  access_log_path: /tmp/admin_access.log\n
+    \ address:\n    socket_address:\n      address: 0.0.0.0\n      port_value: 10001\n"
 kind: ConfigMap
 metadata:
   name: envoy-config-servicebroker
@@ -292,6 +282,10 @@ spec:
     port: 10001
     protocol: TCP
     targetPort: 10001
+  - name: envoy-grpc
+    port: 10000
+    protocol: TCP
+    targetPort: 10000
   selector:
     run: aion-servicebroker
   type: ClusterIP
@@ -557,6 +551,8 @@ spec:
           name: envoy-redis
         - containerPort: 10001
           name: envoy-admin
+        - containerPort: 10000
+          name: envoy-grpc
         resources:
           limits:
             cpu: 20m
