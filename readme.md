@@ -27,12 +27,12 @@ make build
 
 ### AIONのデプロイ
 ```shell
-sh kubectl-apply.sh
+sh aion-start.sh
 ```
 
 ### AIONの削除
 ```shell
-sh kubectl-delete.sh
+sh aion-stop.sh
 ```
 
 ## クラスター構成でのAIONのデプロイ方法
