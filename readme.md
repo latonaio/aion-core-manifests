@@ -1,5 +1,5 @@
 ## **aion-core-manifests**
-aion-core-manifests は aion-coreのデプロイを行うために必要不可欠なマニフェストファイル群です。
+aion-coreのデプロイを行うために必要不可欠なマニフェストファイル群です。
 
 aion-coreについては[こちら](https://github.com/latonaio/aion-core)をご覧ください。
 ## 概要
@@ -7,7 +7,7 @@ aion-coreについては[こちら](https://github.com/latonaio/aion-core)をご
 
 なお、クラスター構成にする場合はmaster nodeのあるマシン上に配備してください。
 ## 動作環境
-AION の使用には aion-core のクローンが必要です。また Kubernetes が動作する必要があります。
+aion-coreのクローンが必要です。
 
 * [aion-core](https://github.com/latonaio/aion-core)
 * OS: Linux
