@@ -1,5 +1,5 @@
 ## **aion-core-manifests**
-aion-coreのデプロイを行うために必要不可欠なマニフェストファイル群です。
+aion-core-manifests は aion-coreのデプロイを行うために必要不可欠なマニフェストファイル群です。
 
 aion-coreについては[こちら](https://github.com/latonaio/aion-core)をご覧ください。
 ## 概要
@@ -7,7 +7,7 @@ aion-coreについては[こちら](https://github.com/latonaio/aion-core)をご
 
 なお、クラスター構成にする場合はmaster nodeのあるマシン上に配備してください。
 ## 動作環境
-aion-coreのクローンが必要です。
+AION の使用には aion-core のクローンが必要です。また Kubernetes が動作する必要があります。
 
 * [aion-core](https://github.com/latonaio/aion-core)
 * OS: Linux
@@ -19,18 +19,18 @@ aion-coreのクローンが必要です。
 kubectl get node -o wide
 ```
 
-## 単体構成でのAIONのデプロイ方法
+## 単体構成でのAIONの起動/停止方法
 ### マニフェスト作成
 ```shell
 make build
 ```
 
-### AIONのデプロイ
+### AIONの起動
 ```shell
 sh aion-start.sh
 ```
 
-### AIONの削除
+### AIONの停止
 ```shell
 sh aion-stop.sh
 ```
