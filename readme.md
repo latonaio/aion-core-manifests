@@ -1,11 +1,30 @@
 ## **aion-core-manifests**
-aion-core-manifests は aion-coreのデプロイを行うために必要不可欠なマニフェストファイル群です。
+aion-core-manifests は aion-coreのデプロイ、稼働を行うために必要不可欠なマニフェストファイルです。
 
 aion-coreについては[こちら](https://github.com/latonaio/aion-core)をご覧ください。
 ## 概要
-[aion-coreのセットアップ](https://github.com/latonaio/aion-core)で作成したDocker imageからこれらのマニフェストファイルを元にaion-coreを構成します。以下では単体構成とクラスター構成のそれぞれの場合についてaion-coreのデプロイ方法と削除方法をまとめます。
+[aion-coreのセットアップ](https://github.com/latonaio/aion-core)で作成したDocker Imagesからこれらのマニフェストファイルを元にaion-core および関連リソースを構成します。  
+  
+### default.yml    
+default.yml は、Kubernetesの定義ファイルです。  
+AION および関連リソースを起動するために必要なリソースを定義し、起動の際にその必要なリソースが立ち上がり、稼働するようにします。  
+aion-core-manifests の generated 下の default.yml に、yamlファイルが配置されています。    
 
-なお、クラスター構成にする場合はmaster nodeのあるマシン上に配備してください。
+定義されているリソースは、下記の通りです。  
+
+* ServiceAccount  
+* ClusterRoleBinding  
+* PersistentVolume  
+* PersistentVolumeClaim  
+* aion-servicebroker  
+* aion-statuskanban  
+* aion-kanban-replicator  
+* aion-sendanything  
+* Envoy/Configmap  
+* Rediscluster  
+* MongoDB  
+* 各Deployment    
+
 ## 動作環境
 AION の使用には aion-core のクローンが必要です。また Kubernetes が動作する必要があります。
 
