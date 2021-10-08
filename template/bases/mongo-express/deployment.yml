@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-express-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels:
+        app: mongo-express
+    spec:
+      containers:
+        - name: mongo-express
+          image: mongo-express
+
+          env:
+            - name: MONGODB_USER
+              value: root
+            - name: MONGODB_PASS
+              value: root
+          ports:
+            - name: mongo-express
+              containerPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-express-service
+spec:
+  selector:
+    app: mongo-express
+  type: LoadBalancer
+  ports:
+    - name: mongo-express
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+      nodePort: 32767

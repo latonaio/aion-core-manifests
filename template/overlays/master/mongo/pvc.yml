@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mongo-pv-claim
-spec:
-  volumeName: mongo-pv-volume-default

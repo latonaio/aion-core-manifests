@@ -11,8 +11,7 @@ apply-worker:
 
 .PHONY: apply-master
 apply-master:
-	docker pull envoyproxy/envoy:v1.14.1
-	docker tag envoyproxy/envoy:v1.14.1 latonaio/envoy:latest
+	docker pull envoyproxy/envoy:v1.16-latest
 	sh kubectl-apply-target-node.sh master
 
 .PHONY: delete-worker

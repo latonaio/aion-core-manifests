@@ -388,7 +388,7 @@ spec:
         - /etc/envoy/envoy.yaml
         command:
         - /usr/local/bin/envoy
-        image: latonaio/envoy:latest
+        image: envoyproxy/envoy:v1.16-latest
         imagePullPolicy: IfNotPresent
         name: envoy
         ports:
@@ -461,7 +461,7 @@ spec:
         - --config-path /etc/envoy/envoy.yaml
         command:
         - /usr/local/bin/envoy
-        image: latonaio/envoy:latest
+        image: envoyproxy/envoy:v1.16-latest
         imagePullPolicy: IfNotPresent
         name: envoy
         ports:
@@ -543,7 +543,7 @@ spec:
         - --config-path /etc/envoy/envoy.yaml
         command:
         - /usr/local/bin/envoy
-        image: latonaio/envoy:latest
+        image: envoyproxy/envoy:v1.16-latest
         imagePullPolicy: IfNotPresent
         name: envoy
         ports:
@@ -630,7 +630,7 @@ spec:
         - /etc/envoy/envoy.yaml
         command:
         - /usr/local/bin/envoy
-        image: latonaio/envoy:latest
+        image: envoyproxy/envoy:v1.16-latest
         imagePullPolicy: IfNotPresent
         name: envoy
         ports:

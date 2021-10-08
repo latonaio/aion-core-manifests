@@ -45,7 +45,7 @@ spec:
               mountPath: /var/lib/aion/config
 
         - name: envoy
-          image: latonaio/envoy:latest
+          image: envoyproxy/envoy:v1.16-latest
           imagePullPolicy: IfNotPresent
           command:
             - "/usr/local/bin/envoy"

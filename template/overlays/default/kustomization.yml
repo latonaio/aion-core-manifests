@@ -4,6 +4,7 @@ bases:
 - ./authorization
 - ./redis
 - ./mongo
+- ./mongo-express
 - ./service-broker
 - ./status-kanban
 - ./kanban-replicator

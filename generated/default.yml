@@ -314,6 +314,22 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: mongo-express-service
+  namespace: default
+spec:
+  ports:
+  - name: mongo-express
+    nodePort: 32767
+    port: 8081
+    protocol: TCP
+    targetPort: 8081
+  selector:
+    app: mongo-express
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: mongo
   namespace: default
 spec:
@@ -384,7 +400,7 @@ spec:
         - /etc/envoy/envoy.yaml
         command:
         - /usr/local/bin/envoy
-        image: latonaio/envoy:latest
+        image: envoyproxy/envoy:v1.16-latest
         imagePullPolicy: IfNotPresent
         name: envoy
         ports:
@@ -457,7 +473,7 @@ spec:
         - --config-path /etc/envoy/envoy.yaml
         command:
         - /usr/local/bin/envoy
-        image: latonaio/envoy:latest
+        image: envoyproxy/envoy:v1.16-latest
         imagePullPolicy: IfNotPresent
         name: envoy
         ports:
@@ -539,7 +555,7 @@ spec:
         - --config-path /etc/envoy/envoy.yaml
         command:
         - /usr/local/bin/envoy
-        image: latonaio/envoy:latest
+        image: envoyproxy/envoy:v1.16-latest
         imagePullPolicy: IfNotPresent
         name: envoy
         ports:
@@ -626,7 +642,7 @@ spec:
         - /etc/envoy/envoy.yaml
         command:
         - /usr/local/bin/envoy
-        image: latonaio/envoy:latest
+        image: envoyproxy/envoy:v1.16-latest
         imagePullPolicy: IfNotPresent
         name: envoy
         ports:
@@ -661,6 +677,33 @@ spec:
       - configMap:
           name: envoy-config-statuskanban
         name: envoy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-express-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels:
+        app: mongo-express
+    spec:
+      containers:
+      - env:
+        - name: MONGODB_USER
+          value: root
+        - name: MONGODB_PASS
+          value: root
+        image: mongo-express
+        name: mongo-express
+        ports:
+        - containerPort: 8081
+          name: mongo-express
 ---
 apiVersion: apps/v1
 kind: Deployment

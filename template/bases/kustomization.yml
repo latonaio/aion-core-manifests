@@ -1,8 +1,0 @@
-resources:
-  - common/service-account.yml
-  - mongo/deployment.yml
-  - mongo/pvc.yml
-  - mongo/service.yml
-  - redis/deployment.yml
-  - redis/service.yml
-
