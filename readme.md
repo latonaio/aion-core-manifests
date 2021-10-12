@@ -1,16 +1,16 @@
 ## **aion-core-manifests**
-aion-core-manifests は aion-coreのデプロイ、稼働を行うために必要不可欠なマニフェストファイルです。
+aion-core-manifests は aion-core および 関連リソース のデプロイ・稼働を行うために必要不可欠なマニフェストファイルです。
 
-aion-coreについては[こちら](https://github.com/latonaio/aion-core)をご覧ください。
+aion-core および 関連リソース については[こちら](https://github.com/latonaio/aion-core)をご覧ください。
 ## 概要
-[aion-coreのセットアップ](https://github.com/latonaio/aion-core)で作成したDocker Imagesからこれらのマニフェストファイルを元にaion-core および関連リソースを構成します。  
+[aion-coreのセットアップ](https://github.com/latonaio/aion-core)で作成したDocker Imagesからこれらのマニフェストファイルを元に aion-core および 関連リソース を構成・構築します。  
   
 ### default.yml    
-default.yml は、Kubernetesの定義ファイルです。  
-AION および関連リソースを起動するために必要なリソースを定義し、起動の際にその必要なリソースが立ち上がり、稼働するようにします。  
+default.yml は、(エッジ)Kubernetes環境を前提とした aion-core および 関連リソース の定義ファイルです。  
+AION および 関連リソース をデプロイ・稼働するために必要なリソースが定義されます。  
 aion-core-manifests の generated 下の default.yml に、yamlファイルが配置されています。    
 
-定義されているリソースは、下記の通りです。  
+default.yml に定義されているリソースは、下記の通りです。  
 
 * ServiceAccount  
 * ClusterRoleBinding  
@@ -25,8 +25,8 @@ aion-core-manifests の generated 下の default.yml に、yamlファイルが�
 * MongoDB  
 * 各Deployment    
 
-## 動作環境
-AION の使用には aion-core のクローンが必要です。また Kubernetes が動作する必要があります。
+## 前提条件・動作環境
+aion-core-manifests の使用には aion-core のクローンが必要です。また Kubernetes が動作する必要があります。
 
 * [aion-core](https://github.com/latonaio/aion-core)
 * OS: Linux
@@ -38,7 +38,7 @@ AION の使用には aion-core のクローンが必要です。また Kubernete
 kubectl get node -o wide
 ```
 
-## 単体構成でのAIONの起動/停止方法
+## エッジ端末単体構成でのAIONの起動/停止方法
 ### マニフェスト作成
 ```shell
 make build
@@ -54,7 +54,7 @@ sh aion-start.sh
 sh aion-stop.sh
 ```
 
-## クラスター構成でのAIONのデプロイ方法
+## エッジクラスター構成でのAIONのデプロイ方法
 ### マニフェスト作成
 
 `hostname` は配備したいnodeのホスト名を使用すること
