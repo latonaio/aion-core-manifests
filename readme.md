@@ -4,13 +4,35 @@ aion-core-manifests は aion-core および 関連リソース のデプロイ�
 aion-core および 関連リソース については[こちら](https://github.com/latonaio/aion-core)をご覧ください。
 ## 概要
 [aion-coreのセットアップ](https://github.com/latonaio/aion-core)で作成したDocker Imagesからこれらのマニフェストファイルを元に aion-core および 関連リソース を構成・構築します。  
-  
-### default.yml    
-default.yml は、(エッジ)Kubernetes環境を前提とした aion-core および 関連リソース の定義ファイルです。  
-AION および 関連リソース をデプロイ・稼働するために必要なリソースが定義されます。  
-aion-core-manifests の generated 下の default.yml に、yamlファイルが配置されています。    
 
-default.yml に定義されているリソースは、下記の通りです。  
+### template  
+template は、(エッジ)Kubernetes環境を前提とした aion-core および 関連リソース の kubernetes 定義ファイルです。  
+AION および 関連リソース をデプロイ・稼働するために必要なリソースが定義されます。   
+template の bases 下に、必要なyamlファイルが配置されています。  
+定義されているリソースは、下記の通りです。   
+
+* authorization   
+* service-broker   
+* status-kanban   
+* kanban-replicator  
+* send-anything   
+* redis   
+* mongo    
+* mongo-express      
+
+また、template overlays 下に、overlaysとして（エッジコンピューティング環境のために必要な）yamlファイルが配置されています。（ほとんどが最低限必要な初期値で構成されています）
+
+### generatedの生成  
+
+以下のコマンドで、generated下のyamlファイル（default.yml）が生成されます。
+```
+make build
+```
+   
+### default.yml    
+aion-core-manifests の generated 下の default.yml に、サンプルとして、yamlファイルが配置されています。    
+
+default.yml 内のリソースは、下記の通りです。（template の定義ファイルに基づいて生成されます）  
 
 * ServiceAccount  
 * ClusterRoleBinding  
@@ -38,8 +60,8 @@ aion-core-manifests の使用には aion-core のクローンが必要です。�
 kubectl get node -o wide
 ```
 
-## エッジ端末単体構成でのAIONの起動/停止方法
-### マニフェスト作成
+## エッジ端末単体構成でのマニフェスト作成、AIONの起動/停止方法
+### マニフェスト作成（generatedが生成されます）
 ```shell
 make build
 ```
@@ -54,10 +76,10 @@ sh aion-start.sh
 sh aion-stop.sh
 ```
 
-## エッジクラスター構成でのAIONのデプロイ方法
-### マニフェスト作成
+## エッジクラスター構成でのマニフェスト作成、AIONのデプロイ/削除方法
+### マニフェスト作成（generatedが生成されます）
 
-`hostname` は配備したいnodeのホスト名を使用すること
+`hostname` には配備するnodeのホスト名を使用してください
 ```shell
 # master
 make build-master HOST=$(hostname)
