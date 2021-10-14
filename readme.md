@@ -5,15 +5,6 @@ aion-core および 関連リソース については[こちら](https://github
 ## 概要
 [aion-coreのセットアップ](https://github.com/latonaio/aion-core)で作成したDocker Imagesからこれらのマニフェストファイルを元にaion-core および関連リソースを構成します。  
   
-### init_default.yml
-init_default.yml は、Kubenetesの定義ファイルです。
-AION および関連リソースを起動する前段階で必要なリソースが立ち上がり、稼働するようにします。
-aion-core-manifests の generated 下の init_default に、yamlファイルが配置されています。
-
-定義されているリソースは、下記の通りです。
-
-* rabbitmq
-
 ### template  
 template は、(エッジ)Kubernetes環境を前提とした aion-core および 関連リソース の kubernetes 定義ファイルです。  
 AION および 関連リソース をデプロイ・稼働するために必要なリソースが定義されます。   
@@ -26,6 +17,7 @@ template の bases 下に、必要なyamlファイルが配置されています
 * kanban-replicator  
 * send-anything   
 * redis   
+* rabbitmq  
 * mongo    
 * mongo-express      
 
@@ -33,7 +25,7 @@ template の bases 下に、必要なyamlファイルが配置されています
 
 ### generatedの生成  
 
-以下のコマンドで、generated下のyamlファイル（default.yml）が生成されます。
+以下のコマンドで、generated下のyamlファイル（default.yml、等）が生成されます。
 ```
 make build
 ```
@@ -53,6 +45,7 @@ default.yml 内のリソースは、下記の通りです。（template の定�
 * aion-sendanything  
 * Envoy/Configmap  
 * Rediscluster  
+* RabbitMQ  
 * MongoDB  
 * 各Deployment    
 
