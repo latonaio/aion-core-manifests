@@ -19,7 +19,7 @@ subjects:
 ---
 apiVersion: v1
 data:
-  envoy.yaml: |
+  envoy.yaml: |-
     static_resources:
       listeners:
       - name: redis_listener
@@ -314,6 +314,19 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: mongo
+  namespace: default
+spec:
+  ports:
+  - port: 27017
+    targetPort: 27017
+  selector:
+    app: mongo
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: mongo-express-service
   namespace: default
 spec:
@@ -330,19 +343,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongo
-  namespace: default
-spec:
-  ports:
-  - port: 27017
-    targetPort: 27017
-  selector:
-    app: mongo
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
   name: redis-cluster
   namespace: default
 spec:
@@ -352,6 +352,35 @@ spec:
   selector:
     app: redis-cluster
   type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    type: local
+  name: mongo-pv-volume-default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 5Gi
+  hostPath:
+    path: /var/lib/aion/default/mnt/mongo_data
+  storageClassName: mongo
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pv-claim
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: mongo
+  volumeName: mongo-pv-volume-default
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -494,12 +523,12 @@ spec:
       - name: dockerhub
       shareProcessNamespace: true
       volumes:
-      - configMap:
-          name: envoy-config-sendanything
-        name: envoy
       - hostPath:
           path: /var/lib/aion/default
         name: data
+      - configMap:
+          name: envoy-config-sendanything
+        name: envoy
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -590,12 +619,12 @@ spec:
       serviceAccountName: aion-default
       shareProcessNamespace: true
       volumes:
-      - configMap:
-          name: envoy-config-servicebroker
-        name: envoy
       - hostPath:
           path: /var/lib/aion/default/config
         name: config
+      - configMap:
+          name: envoy-config-servicebroker
+        name: envoy
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -681,33 +710,6 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo-express-deployment
-  namespace: default
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: mongo-express
-  template:
-    metadata:
-      labels:
-        app: mongo-express
-    spec:
-      containers:
-      - env:
-        - name: MONGODB_USER
-          value: root
-        - name: MONGODB_PASS
-          value: root
-        image: mongo-express
-        name: mongo-express
-        ports:
-        - containerPort: 8081
-          name: mongo-express
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
   name: mongo
   namespace: default
 spec:
@@ -750,6 +752,33 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: mongo-express-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels:
+        app: mongo-express
+    spec:
+      containers:
+      - env:
+        - name: MONGODB_USER
+          value: root
+        - name: MONGODB_PASS
+          value: root
+        image: mongo-express
+        name: mongo-express
+        ports:
+        - containerPort: 8081
+          name: mongo-express
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: redis-cluster
   namespace: default
 spec:
@@ -781,32 +810,3 @@ spec:
           requests:
             cpu: 5m
             memory: 50Mi
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  labels:
-    type: local
-  name: mongo-pv-volume-default
-spec:
-  accessModes:
-  - ReadWriteOnce
-  capacity:
-    storage: 5Gi
-  hostPath:
-    path: /var/lib/aion/default/mnt/mongo_data
-  storageClassName: mongo
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mongo-pv-claim
-  namespace: default
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-  storageClassName: mongo
-  volumeName: mongo-pv-volume-default

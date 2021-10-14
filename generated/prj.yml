@@ -24,7 +24,7 @@ subjects:
 ---
 apiVersion: v1
 data:
-  envoy.yaml: |
+  envoy.yaml: |-
     static_resources:
       listeners:
       - name: redis_listener
@@ -341,6 +341,35 @@ spec:
     app: redis-cluster
   type: ClusterIP
 ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    type: local
+  name: mongo-pv-volume-prj
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 5Gi
+  hostPath:
+    path: /var/lib/aion/prj/mnt/mongo_data
+  storageClassName: mongo
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pv-claim
+  namespace: prj
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: mongo
+  volumeName: mongo-pv-volume-prj
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -482,12 +511,12 @@ spec:
       - name: dockerhub
       shareProcessNamespace: true
       volumes:
-      - configMap:
-          name: envoy-config-sendanything
-        name: envoy
       - hostPath:
           path: /var/lib/aion/prj
         name: data
+      - configMap:
+          name: envoy-config-sendanything
+        name: envoy
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -578,12 +607,12 @@ spec:
       serviceAccountName: aion-prj
       shareProcessNamespace: true
       volumes:
-      - configMap:
-          name: envoy-config-servicebroker
-        name: envoy
       - hostPath:
           path: /var/lib/aion/prj/config
         name: config
+      - configMap:
+          name: envoy-config-servicebroker
+        name: envoy
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -742,32 +771,3 @@ spec:
           requests:
             cpu: 5m
             memory: 50Mi
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  labels:
-    type: local
-  name: mongo-pv-volume-prj
-spec:
-  accessModes:
-  - ReadWriteOnce
-  capacity:
-    storage: 5Gi
-  hostPath:
-    path: /var/lib/aion/prj/mnt/mongo_data
-  storageClassName: mongo
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mongo-pv-claim
-  namespace: prj
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-  storageClassName: mongo
-  volumeName: mongo-pv-volume-prj

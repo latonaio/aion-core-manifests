@@ -1,0 +1,6 @@
+## init_default
+init_defaultはoverlays/default/kustomization.ymlを実行する前に実行しておきたいファイルを実行するためのディレクトリです。
+現在は、下記のPodが立ち上がるように設定されています。
+
+- rabbitmq
+他のマイクロサービスがrabbitmqと並行で起動すると、rabbitmqに接続する場合に接続できない恐れがあるため。

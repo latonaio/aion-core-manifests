@@ -2,6 +2,9 @@ HOST= ""
 
 .PHONY: build
 build:
+	kubectl kustomize template/overlays/init_default > generated/init_default.yml
+	kubectl kustomize template/overlays/init_prj > generated/init_prj.yml
+
 	kubectl kustomize template/overlays/default > generated/default.yml
 	kubectl kustomize template/overlays/prj > generated/prj.yml
 

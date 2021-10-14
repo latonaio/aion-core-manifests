@@ -3,7 +3,16 @@ aion-core-manifests は aion-core および 関連リソース のデプロイ�
 
 aion-core および 関連リソース については[こちら](https://github.com/latonaio/aion-core)をご覧ください。
 ## 概要
-[aion-coreのセットアップ](https://github.com/latonaio/aion-core)で作成したDocker Imagesからこれらのマニフェストファイルを元に aion-core および 関連リソース を構成・構築します。  
+[aion-coreのセットアップ](https://github.com/latonaio/aion-core)で作成したDocker Imagesからこれらのマニフェストファイルを元にaion-core および関連リソースを構成します。  
+  
+### init_default.yml
+init_default.yml は、Kubenetesの定義ファイルです。
+AION および関連リソースを起動する前段階で必要なリソースが立ち上がり、稼働するようにします。
+aion-core-manifests の generated 下の init_default に、yamlファイルが配置されています。
+
+定義されているリソースは、下記の通りです。
+
+* rabbitmq
 
 ### template  
 template は、(エッジ)Kubernetes環境を前提とした aion-core および 関連リソース の kubernetes 定義ファイルです。  
