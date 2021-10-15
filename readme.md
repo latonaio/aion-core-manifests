@@ -10,13 +10,13 @@ template/bases は、(エッジ)Kubernetes環境を前提とした aion-core お
 AION および 関連リソース をデプロイ・稼働するために必要なリソースが定義されます。   
 定義されているリソースは、下記の通りです。   
 
-* authorization   
+* authorization  
+* rabbitmq  
 * service-broker   
 * status-kanban   
 * kanban-replicator  
 * send-anything   
 * redis   
-* rabbitmq  
 * mongo    
 * mongo-express      
 
