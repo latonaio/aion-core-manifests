@@ -1,6 +1,9 @@
 HOST= ""
 
 .PHONY: build
+
+# init_default には、AIONアーキテクチャ構成リソースの初期立ち上げとして必要なリソース(RabbitMQ)が含まれています。
+# RabbitMQ を初期立ち上げすることが必要な理由は、aion-core および関連リソースの RabbitMQ への 依存度 が重要であるためです。
 build:
 	kubectl kustomize template/overlays/init_default > generated/init_default.yml
 	kubectl kustomize template/overlays/init_prj > generated/init_prj.yml

@@ -1,14 +1,13 @@
 ## **aion-core-manifests**
-aion-core-manifests は aion-core および 関連リソース のデプロイ・稼働を行うために必要不可欠なマニフェストファイルです。
+aion-core-manifests は aion-core および 関連リソース のデプロイ・稼働を行うために必要不可欠なマニフェストファイル群です。
 
 aion-core および 関連リソース については[こちら](https://github.com/latonaio/aion-core)をご覧ください。
 ## 概要
 [aion-coreのセットアップ](https://github.com/latonaio/aion-core)で作成したDocker Imagesからこれらのマニフェストファイルを元にaion-core および関連リソースを構成します。  
   
-### template  
-template は、(エッジ)Kubernetes環境を前提とした aion-core および 関連リソース の kubernetes 定義ファイルです。  
+### template/bases、template/overlays  
+template/bases は、(エッジ)Kubernetes環境を前提とした aion-core および 関連リソース の Kubernetes 定義ファイル群です。  
 AION および 関連リソース をデプロイ・稼働するために必要なリソースが定義されます。   
-template の bases 下に、必要なyamlファイルが配置されています。  
 定義されているリソースは、下記の通りです。   
 
 * authorization   
@@ -23,17 +22,35 @@ template の bases 下に、必要なyamlファイルが配置されています
 
 また、template overlays 下に、overlaysとして（エッジコンピューティング環境のために必要な）yamlファイルが配置されています。（ほとんどが最低限必要な初期値で構成されています）
 
-### generatedの生成  
+### template/overlays/init_default/init_default.yml  
 
-以下のコマンドで、generated下のyamlファイル（default.yml、等）が生成されます。
+template/overlays/init_default には、AIONアーキテクチャ構成リソースの初期立ち上げとして必要なリソース(RabbitMQ) の 特別な init_default.yamlファイル が含まれています。  
+AION において RabbitMQ を初期立ち上げすることが必要な理由は、aion-core および関連リソースの RabbitMQ への 依存度 が重要であるためです。  
+なお、AION では、まず、init_default.yml の定義により、Rabbit-MQ が立ち上がります。その後、default.ymlの定義により、Rabbit MQ 以外の 各リソース が立ち上がります。
+
+init_default.yml の生成ソース行は、 Makefile 内の 下記の箇所です。
+```
+kubectl kustomize template/overlays/init_default > generated/init_default.yml
+```
+  
+参考として、default.yml の生成ソース行は、Makefile 内の 下記の箇所です。
+```
+kubectl kustomize template/overlays/default > generated/default.yml
+```
+
+### generated/yaml ファイルの生成  
+
+以下のコマンドで、generated/yamlファイル（init_default.yml、default.yml、等）が生成されます。
 ```
 make build
 ```
-   
-### default.yml    
+  
+上記の通り、AION では、まず、init_default.yml の定義により、Rabbit-MQ が立ち上がります。その後、default.ymlの定義により、Rabbit MQ 以外の 各リソース が立ち上がります。  
+
+### default.yml（生成後のサンプルファイル）    
 aion-core-manifests の generated 下の default.yml に、サンプルとして、yamlファイルが配置されています。    
 
-default.yml 内のリソースは、下記の通りです。（template の定義ファイルに基づいて生成されます）  
+生成後の サンプル default.yml 内のリソースは、下記の通りです。（template の定義ファイルに基づいて生成されます）  
 
 * ServiceAccount  
 * ClusterRoleBinding  
@@ -42,12 +59,13 @@ default.yml 内のリソースは、下記の通りです。（template の定�
 * aion-servicebroker  
 * aion-statuskanban  
 * aion-kanban-replicator  
-* aion-sendanything  
+* aion-sendanything
+* Rediscluster 
 * Envoy/Configmap  
-* Rediscluster  
-* RabbitMQ  
 * MongoDB  
 * 各Deployment    
+
+（※RabbitMQ のリソース は init_default.yml 内にあります）
 
 ## 前提条件・動作環境
 aion-core-manifests の使用には aion-core のクローンが必要です。また Kubernetes が動作する必要があります。
