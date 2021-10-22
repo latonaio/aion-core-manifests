@@ -125,3 +125,19 @@ make delete-master
 # worker
 make delete-worker HOST=$(hostname)
 ```
+
+## Port 番号 の 適用方針  
+AIONプラットフォーム における Port 番号 の適用方針は、以下の通りです。  
+一般にPort番号は、Kubernetes の ymlファイルで、サービスもしくはマイクロサービス毎に定義されるものです。  
+AION では、マイクロサービス毎に Port番号 が定義されています。  
+
+| type                 | Port固定の主要リソース       | aion-core / 個別のマイクロサービス(MS)      |   
+| -------------------- | -------------------------- | ----------------------------------------- |   
+| Envoy                | Redis -> 6379              | aion-core -> 10000(grpc) / 10001(admin)   |
+|                      |                            | 個別MS -> 必要な場合、適宜Port番号を設定     |
+| NodePort             | RabbitMQ -> 5672           | aion-core -> NodePort 利用なし             |
+|                      | RabbitMQ(外部)->32094/32095| 個別MS ->：50500～50999をMS毎に分けて設定    |
+|                      | MySQL -> 3306              | 個別MS(外部) ->：30500～30999を設定       　|
+|                      | MySQL(外部) -> 30000       |                                            |
+| ClusterIP            | Redis(envoyless) -> 6379   | aion-core -> ClusterIP 利用なし            |
+|                      | MongoDB -> 27017           | 個別MS ->：50500～50999をMS毎に分けて設定   |
