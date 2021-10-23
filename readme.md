@@ -141,3 +141,5 @@ AION では、マイクロサービス毎に Port番号 が定義されていま
 |                      | MySQL(外部) -> 30000       |                                            |
 | ClusterIP            | Redis(envoyless) -> 6379   | aion-core -> ClusterIP 利用なし            |
 |                      | MongoDB -> 27017           | 個別MS ->：50500～50999をMS毎に分けて設定   |
+| Localhost            | ReactJS -> 3000            | -                                         |
+
