@@ -12,6 +12,7 @@ AION および 関連リソース をデプロイ・稼働するために必要�
 
 * authorization  
 * rabbitmq  
+* fluentd  
 * service-broker   
 * status-kanban   
 * kanban-replicator  
@@ -59,7 +60,8 @@ aion-core-manifests の generated 下の default.yml に、サンプルとして
 * aion-servicebroker  
 * aion-statuskanban  
 * aion-kanban-replicator  
-* aion-sendanything
+* aion-sendanything  
+* fluentd  
 * Rediscluster 
 * Envoy/Configmap  
 * MongoDB  
