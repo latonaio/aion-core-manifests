@@ -61,7 +61,7 @@ aion-core-manifests の generated 下の default.yml に、サンプルとして
 * aion-statuskanban  
 * aion-kanban-replicator  
 * aion-sendanything  
-* fluentd  
+* Fluentd  
 * Rediscluster 
 * Envoy/Configmap  
 * MongoDB  
