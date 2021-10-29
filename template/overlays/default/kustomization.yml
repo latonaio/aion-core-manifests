@@ -2,6 +2,7 @@ namespace: default
 
 bases:
 - ./authorization
+- ./fluentd
 - ./redis
 - ./mongo
 - ./mongo-express
