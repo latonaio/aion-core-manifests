@@ -22,15 +22,15 @@ spec:
       containers:
       - env:
         - name: K8S_NODE_NAME
-          value: "mercury"
+          value: "your_node_name"
         - name: POS_FILE
           value: /var/log/fluentd/fluentd-docker.pos
         - name: CA_FILE
           value: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         - name: BEARER_TOKEN_FILE
           value: /var/run/secrets/kubernetes.io/serviceaccount/token
-        name: fluentd
-        image: latona/fluentd
+        name: fluentd-core-kube
+        image: latona/fluentd-core-kube
         imagePullPolicy: IfNotPresent
         resources:
           limits:
@@ -91,145 +91,12 @@ data:
       skip_namespace_metadata true
     </filter>
 
-    <filter kubernetes.var.log.containers.register-face-to-guest-table-kube-001*.log>
-      @type grep
-      <regexp>
-        key log
-        pattern /updateGuest succeeded/
-      </regexp>
-    </filter>
-
     <match kubernetes.**>
       @type rewrite_tag_filter
       <rule>
         key $.kubernetes.container_name
-        pattern  /aion-kanban-replicator/
-        tag mongo.aion_kanban_replicator
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /aion-sendanything/
-        tag mongo.aion_sendanything
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /aion-servicebroker/
-        tag mongo.aion_servicebroker
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /aion-statuskanban/
-        tag mongo.aion_statuskanban
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /authenticator/
-        tag mongo.authenticator
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /data-sweeper-batch/
-        tag mongo.data_sweeper_batch
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /data-sweeper/
-        tag mongo.data_sweeper
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /event-driven-face-existence-detection/
-        tag mongo.event-driven-face-existence-detection
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /azure-face-api-identifier-kube/
-        tag mongo.azure-face-api-identifier-kube
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /fluentd/
-        tag mongo.fluentd
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /load-balancer-for-omotebako-smartphone/
-        tag mongo.load_balancer_for_omotebako_smartphone
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /mongo/
-        tag mongo.mongo
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /mysql/
-        tag mongo.mysql
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /redis-cluster/
-        tag mongo.redis_cluster
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /azure-face-api-registrator-kube/
-        tag mongo.azure-face-api-registrator-kube
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /register-face-to-guest-table-kube/
-        tag mongo.register-face-to-guest-table-kube
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /ui-backend-for-omotebako-backup/
-        tag mongo.ui_backend_for_omotebako_backup
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /ui-backend-for-omotebako-calendar/
-        tag mongo.ui_backend_for_omotebako_calendar
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /ui-backend-for-omotebako-gif/
-        tag mongo.ui_backend_for_omotebako_gif
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /ui-backend-for-omotebako-random-voice/
-        tag mongo.ui_backend_for_omotebako_random_voice
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /ui-backend-for-omotebako-redis/
-        tag mongo.ui_backend_for_omotebako_redis
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /ui-backend-for-omotebako-site-controller/
-        tag mongo.ui_backend_for_omotebako_site_controller
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /ui-backend-for-omotebako-streaming-audio/
-        tag mongo.ui_backend_for_omotebako_streaming_audio
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /ui-frontend-for-omotebako-mobile/
-        tag mongo.ui_frontend_for_omotebako_mobile
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /ui-frontend-for-omotebako/
-        tag mongo.ui_frontend_for_omotebako
-      </rule>
-      <rule>
-        key $.kubernetes.container_name
-        pattern  /ui-backend-for-omotebako/
-        tag mongo.ui_backend_for_omotebako
+        pattern  /hogehoge/
+        tag mongo.hogehoge
       </rule>
     </match>
 
