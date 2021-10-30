@@ -252,14 +252,14 @@ data:
     <source>
     @type tail
     path /var/log/containers/*.log
-    pos_file "#{ENV['COMPUTERNAME']}"
-    tag "#{ENV['SOURCE_TAG']}".*
+    pos_file "#{ENV['POS_FILE']}"
+    tag kubernetes.*
     time_format %Y-%m-%dT%H:%M:%S
     format json
     read_from_head true
     </source>
 
-    <filter "#{ENV['SOURCE_TAG']}".var.log.containers.**.log>
+    <filter "kubernetes.var.log.containers.**.log">
       @type kubernetes_metadata
       ca_file "#{ENV['CA_FILE']}"
       bearer_token_file "#{ENV['BEARER_TOKEN_FILE']}"
@@ -272,18 +272,19 @@ data:
     <match kubernetes.**>
       @type rewrite_tag_filter
       <rule>
-        hogehoge
-        tag "#{ENV['OUTPUT_TAG']}".*
+        key $.kubernetes.container_name
+        pattern  /hogehoge/
+        tag mongo.hogehoge
       </rule>
     </match>
 
-    <match "#{ENV['OUTPUT_TAG']}".**>
+    <match mongo.**>
       @type mongo
-      host "#{ENV['DB_HOST']}"
-      port "#{ENV['DB_PORT']}"
-      database "#{ENV['DB_DATABASE']}"
+      host mongo
+      port 27017
+      database k8s
       collection '${tag}'
-      remove_tag_prefix "#{ENV['OUTPUT_TAG']}".
+      remove_tag_prefix mongo.
       <buffer>
         flush_mode interval
         retry_type exponential_backoff
@@ -890,23 +891,15 @@ spec:
     spec:
       containers:
       - env:
+        - name: K8S_NODE_NAME
+          value: your_node_name
         - name: POS_FILE
           value: /var/log/fluentd/fluentd-docker.pos
         - name: CA_FILE
           value: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         - name: BEARER_TOKEN_FILE
           value: /var/run/secrets/kubernetes.io/serviceaccount/token
-        - name: SOURCE_TAG
-          value: kubernetes
-        - name: OUTPUT_TAG
-          value: mongo
-        - name: DB_HOST
-          value: 10.110.206.200
-        - name: DB_PORT
-          value: 27017
-        - name: DB_DATABASE
-          value: k8s
-      - image: latona/fluentd
+        image: latona/fluentd
         imagePullPolicy: IfNotPresent
         name: fluentd
         resources:
