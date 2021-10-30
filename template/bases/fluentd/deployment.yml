@@ -29,8 +29,8 @@ spec:
           value: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         - name: BEARER_TOKEN_FILE
           value: /var/run/secrets/kubernetes.io/serviceaccount/token
-        name: fluentd-core-kube
-        image: latona/fluentd-core-kube
+        name: fluentd-for-containers-mongodb-kube
+        image: latona/fluentd-for-containers-mongodb-kube
         imagePullPolicy: IfNotPresent
         resources:
           limits:
