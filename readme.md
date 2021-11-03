@@ -5,6 +5,32 @@ aion-core および 関連リソース については[こちら](https://github
 ## 概要
 [aion-coreのセットアップ](https://github.com/latonaio/aion-core)で作成したDocker Imagesからこれらのマニフェストファイルを元にaion-core および関連リソースを構成します。  
   
+### AION の Kubernetes Yaml ファイルの構造（エッジデバイス内） 
+AIONプラットフォームのあるエッジデバイス内において、Kubernetes Yaml ファイルは、次の領域に分かれています。
+
+* Kubernetes コアのYamlファイル  
+
+* AION-Core のYamlファイル  
+
+* 主要なオープンソースリソース のYamlファイル  
+
+* 個別マイクロサービス  のYamlファイル  
+
+
+![kube-yml](docs/structure_of_kube_yamls_aion.png)
+
+### AION の Kubernetes Yaml ファイルの所在
+それぞれの Yamlファイルは、以下のレポジトリにあります。  
+
+* Kubernetes コアのYamlファイル  >>>  [aion-core-manifests](https://github.com/latonaio/aion-core-manifests)  
+
+* AION-Core のYamlファイル  >>>  [aion-core-manifests](https://github.com/latonaio/aion-core-manifests)  
+
+* 主要なオープンソースリソース のYamlファイル  >>>  [aion-core-manifests](https://github.com/latonaio/aion-core-manifests)
+
+* 個別マイクロサービス  のYamlファイル    >>>  [aion-service-definitions](https://github.com/latonaio/aion-service-definitions)
+
+
 ### template/bases、template/overlays  
 template/bases は、(エッジ)Kubernetes環境を前提とした aion-core および 関連リソース の Kubernetes 定義ファイル群です。  
 AION および 関連リソース をデプロイ・稼働するために必要なリソースが定義されます。   
@@ -14,11 +40,6 @@ AION および 関連リソース をデプロイ・稼働するために必要�
 * rabbitmq  
 * fluentd  
 * service-broker   
-* status-kanban   
-* kanban-replicator  
-* send-anything   
-* redis   
-* mongo    
 * mongo-express      
 
 また、template overlays 下に、overlaysとして（エッジコンピューティング環境のために必要な）yamlファイルが配置されています。（ほとんどが最低限必要な初期値で構成されています）
