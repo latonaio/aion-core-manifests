@@ -8,16 +8,16 @@ aion-core および 関連リソース については[こちら](https://github
 ### AION の Kubernetes Yaml ファイルの構造（エッジデバイス内） 
 AIONプラットフォームのあるエッジデバイス内において、Kubernetes Yaml ファイルは、次の領域に分かれています。
 
-* Kubernetes コアのYamlファイル  
-
 * AION-Core のYamlファイル  
 
 * 主要なオープンソースリソース のYamlファイル  
 
 * 個別マイクロサービス  のYamlファイル  
 
+* Kubernetes 生成 Yamlファイル
 
-![kube-yml](docs/structure_of_kube_yamls_aion.png)
+
+![kube-yml](docs/structure_of_kubernets_yamls.png)
 
 ### AION の Kubernetes Yaml ファイルの所在
 それぞれの Yamlファイルは、以下のレポジトリにあります。  
