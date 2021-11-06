@@ -22,13 +22,13 @@ AIONプラットフォームのあるエッジデバイス内において、Kube
 ### AION の Kubernetes Yaml ファイルの所在
 それぞれの Yamlファイルは、以下のレポジトリにあります。  
 
-* Kubernetes コアのYamlファイル  >>>  [aion-core-manifests](https://github.com/latonaio/aion-core-manifests)  
-
 * AION-Core のYamlファイル  >>>  [aion-core-manifests](https://github.com/latonaio/aion-core-manifests)  
 
 * 主要なオープンソースリソース のYamlファイル  >>>  [aion-core-manifests](https://github.com/latonaio/aion-core-manifests)
 
-* 個別マイクロサービス  のYamlファイル    >>>  [aion-service-definitions](https://github.com/latonaio/aion-service-definitions)
+* 個別マイクロサービス  のYamlファイル    >>>  [aion-service-definitions](https://github.com/latonaio/aion-service-definitions)  
+
+* Kubernetes 生成 Yamlファイル  >>>  [aion-core-manifests](https://github.com/latonaio/aion-core-manifests)  
 
 
 ### template/bases、template/overlays  
