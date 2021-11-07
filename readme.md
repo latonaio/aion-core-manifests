@@ -38,11 +38,16 @@ AION および 関連リソース をデプロイ・稼働するために必要�
 
 * authorization  
 * rabbitmq  
+* service-broker
+* statuskanban
+* kanban-replicator
+* sendanything
 * fluentd  
-* service-broker   
+* redis-cluster  
+* mongodB
 * mongo-express      
 
-また、template overlays 下に、overlaysとして（エッジコンピューティング環境のために必要な）yamlファイルが配置されています。（ほとんどが最低限必要な初期値で構成されています）
+また、template overlays 下に、overlaysとして（エッジコンピューティング環境のために必要な）yamlファイルが配置されています。（ほとんどが最低限必要な初期値で構成されています。その理由は、エッジコンピューティング環境のデバイス内では通常、複雑な設定は必要ないからです）
 
 ### template/overlays/init_default/init_default.yml  
 
@@ -95,7 +100,7 @@ aion-core-manifests の使用には aion-core のクローンが必要です。�
 
 * [aion-core](https://github.com/latonaio/aion-core)
 * OS: Linux
-* CPU: Intel64/AMD64/ARM64
+* CPU: ARM/AMD/Intel
 * Kubernetes
 
 ### ノード一覧を取得
