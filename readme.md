@@ -44,7 +44,7 @@ AION および 関連リソース をデプロイ・稼働するために必要�
 * sendanything
 * fluentd  
 * redis-cluster  
-* mongodB
+* mongo
 * mongo-express      
 
 また、template overlays 下に、overlaysとして（エッジコンピューティング環境のために必要な）yamlファイルが配置されています。（ほとんどが最低限必要な初期値で構成されています。その理由は、エッジコンピューティング環境のデバイス内では通常、複雑な設定は必要ないからです）
